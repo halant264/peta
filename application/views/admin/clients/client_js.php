@@ -105,8 +105,8 @@ $(function() {
         undefined, 'undefined', [$('table thead .ticket_created_column').index(), 'desc']);
 
     /* Customer profile contracts table */
-    initDataTable('.table-contracts-single-client', admin_url + 'contracts/table/' + customer_id, undefined,
-        undefined, 'undefined', [6, 'desc']);
+    // initDataTable('.table-contracts-single-client', admin_url + 'contract/table/' + customer_id, undefined,
+    //     undefined, 'undefined', [6, 'desc']);
 
     /* Custome profile contacts table */
     var contactsNotSortable = [];
@@ -115,6 +115,9 @@ $(function() {
     <?php } ?>
     _table_api = initDataTable('.table-contacts', admin_url + 'clients/contacts/' + customer_id,
         contactsNotSortable, contactsNotSortable);
+
+
+        console.log( contactsNotSortable, contactsNotSortable );
     if (_table_api) {
         <?php if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') { ?>
         _table_api.on('draw', function() {
@@ -185,6 +188,7 @@ $(function() {
     }
 
     appValidateForm($('.client-form'), vRules);
+
 
     if (typeof(customer_id) == 'undefined') {
         $('#company').on('blur', function() {
@@ -307,6 +311,20 @@ function validate_contact_form() {
         }
     }, contactFormHandler);
 }
+validate_car_form() ;
+function validate_car_form() {
+    appValidateForm('#car-form', {
+        car_name: 'required',
+        brand: 'required',
+        model_year: 'required',
+        model: 'required',
+        plate_source: 'required',
+        plate_code: 'required',
+        plate_number: 'required',
+
+    }, contactFormHandler);
+}
+
 
 function contactFormHandler(form) {
     $('#contact input[name="is_primary"]').prop('disabled', false);
@@ -363,9 +381,11 @@ function contactFormHandler(form) {
 }
 
 function contact(client_id, contact_id) {
+    
     if (typeof(contact_id) == 'undefined') {
         contact_id = '';
     }
+
     requestGet('clients/form_contact/' + client_id + '/' + contact_id).done(function(response) {
         $('#contact_data').html(response);
         $('#contact').modal({
@@ -381,7 +401,8 @@ function contact(client_id, contact_id) {
         init_selectpicker();
         init_datepicker();
         custom_fields_hyperlink();
-        validate_contact_form();
+        alert("s");
+        validate_car_form();
     }).fail(function(error) {
         var response = JSON.parse(error.responseText);
         alert_float('danger', response.message);
@@ -462,6 +483,56 @@ function fetch_lat_long_from_google_cprofile() {
                 alert_float('danger', data.response.status + ' - ' + data.response.error_message);
             }
         }
+    });
+}
+$(function get_model() {
+    $('#brand').on('change', function() {
+        let model ='' ;
+        if(this.value != ''){
+            requestGet('clients/get_model_brand/' +this.value).done(function(response) 
+            {
+                let modelL ='' ;
+                for (let i = 0; i < response.length; ++i) {
+                    model += '<option value="'+response[i].id+'">'+response[i].model_name+' </option> ' ;
+                }
+                $('#model').html(model);
+                $("#model").selectpicker("refresh");
+                model ='';
+                console.log(model);
+            }).fail(function(error) {
+                    var response = JSON.parse(error.responseText);
+                    alert_float('danger', response.message);
+            });
+        }else{
+            $('#model').html('<option value="" > select model    </option>');
+            $("#model").selectpicker("refresh");
+
+        }
+    });
+ });
+function contact_car(client_id, contact_id) {
+    if (typeof(contact_id) == 'undefined') {
+        contact_id = '';
+    }
+    requestGet('clients/form_contact_car/' + client_id + '/' + contact_id).done(function(response) {
+        $('#contact_data').html(response);
+        $('#contact').modal({
+            show: true,
+            backdrop: 'static'
+        });
+        $('body').off('shown.bs.modal', '#contact');
+        $('body').on('shown.bs.modal', '#contact', function() {
+            if (contact_id == '') {
+                $('#contact').find('input[name="car_name"]').focus();
+            }
+        });
+        init_selectpicker();
+        init_datepicker();
+        custom_fields_hyperlink();
+        validate_contact_form();
+    }).fail(function(error) {
+        var response = JSON.parse(error.responseText);
+        alert_float('danger', response.message);
     });
 }
 </script>

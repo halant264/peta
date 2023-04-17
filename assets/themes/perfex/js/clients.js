@@ -367,6 +367,7 @@ function initDataTable() {
 
 function dt_custom_view(table, column, val) {
   var tableApi = $(table).DataTable();
+
   if (Array.isArray(val)) {
     tableApi.column(column).search(val.join("|"), true, false).draw();
   } else {

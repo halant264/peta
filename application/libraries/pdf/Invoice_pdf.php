@@ -26,6 +26,7 @@ class Invoice_pdf extends App_pdf
         $this->invoice        = $invoice;
         $this->invoice_number = format_invoice_number($this->invoice->id);
 
+        // var_dump("l"); exit();
         $this->SetTitle($this->invoice_number);
     }
 

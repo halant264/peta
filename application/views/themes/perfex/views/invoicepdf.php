@@ -22,6 +22,7 @@ if ($status != Invoices_model::STATUS_PAID && $status != Invoices_model::STATUS_
 // Add logo
 $info_left_column .= pdf_logo_url();
 
+
 // Write top left logo and right column info/text
 pdf_multi_row($info_left_column, $info_right_column, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
 
@@ -98,6 +99,8 @@ $pdf->writeHTML($tblhtml, true, false, false, false, '');
 $pdf->Ln(8);
 
 $tbltotal = '';
+$tbltotal .='<div> dvdvd </div>';
+
 $tbltotal .= '<table cellpadding="6" style="font-size:' . ($font_size + 4) . 'px">';
 $tbltotal .= '
 <tr>
@@ -168,6 +171,7 @@ if (get_option('show_amount_due_on_invoice') == 1 && $invoice->status != Invoice
 
 $tbltotal .= '</table>';
 $pdf->writeHTML($tbltotal, true, false, false, false, '');
+
 
 if (get_option('total_to_words_enabled') == 1) {
     // Set the font bold

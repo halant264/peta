@@ -4,7 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $project_id = $this->ci->input->post('project_id');
 
+
 $aColumns = [
+    db_prefix() .'cars.car_name as car_name',
+    db_prefix() .'cars.plate_number as plate_number',
     'number',
     'total',
     'total_tax',
@@ -24,6 +27,7 @@ $join = [
     'LEFT JOIN ' . db_prefix() . 'clients ON ' . db_prefix() . 'clients.userid = ' . db_prefix() . 'invoices.clientid',
     'LEFT JOIN ' . db_prefix() . 'currencies ON ' . db_prefix() . 'currencies.id = ' . db_prefix() . 'invoices.currency',
     'LEFT JOIN ' . db_prefix() . 'projects ON ' . db_prefix() . 'projects.id = ' . db_prefix() . 'invoices.project_id',
+    'LEFT JOIN ' . db_prefix() . 'cars ON ' . db_prefix() . 'cars.id = ' . db_prefix() . 'invoices.cars_id',
 ];
 
 $custom_fields = get_table_custom_fields('invoice');
@@ -128,6 +132,8 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
+// var_dump($rResult); exit();
+
 foreach ($rResult as $aRow) {
     $row = [];
 
@@ -158,7 +164,7 @@ foreach ($rResult as $aRow) {
 
     $row[] = app_format_money($aRow['total_tax'], $aRow['currency_name']);
 
-    $row[] = $aRow['year'];
+    $row[] = $aRow['year']; 
 
     $row[] = _d($aRow['date']);
 
@@ -168,10 +174,9 @@ foreach ($rResult as $aRow) {
         $row[] = $aRow['deleted_customer_name'];
     }
 
-    $row[] = '<a href="' . admin_url('projects/view/' . $aRow['project_id']) . '">' . $aRow['project_name'] . '</a>';
-    ;
+    $row[] = $aRow['car_name'];
 
-    $row[] = render_tags($aRow['tags']);
+    $row[] = $aRow['plate_number'];
 
     $row[] = _d($aRow['duedate']);
 

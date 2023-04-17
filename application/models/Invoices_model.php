@@ -359,10 +359,17 @@ class Invoices_model extends App_Model
 
         $items = [];
 
+
         if (isset($data['newitems'])) {
+            if(count($data['newitems']) == 1){
+                $data['cars_id'] =$data['task_id_car'];
+            }
             $items = $data['newitems'];
             unset($data['newitems']);
+            unset($data['task_id_car']);
         }
+
+
 
         $data = $this->map_shipping_columns($data, $expense);
 
@@ -388,8 +395,11 @@ class Invoices_model extends App_Model
         $data  = $hook['data'];
         $items = $hook['items'];
 
+
         $this->db->insert(db_prefix() . 'invoices', $data);
         $insert_id = $this->db->insert_id();
+        
+
         if ($insert_id) {
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
@@ -475,6 +485,8 @@ class Invoices_model extends App_Model
 
                     $this->db->where('id', $t);
                     $this->db->update(db_prefix() . 'tasks', $taskUpdateData);
+
+
                 }
             }
 
@@ -486,6 +498,8 @@ class Invoices_model extends App_Model
                     ]);
                 }
             }
+
+
 
             update_invoice_status($insert_id);
 
@@ -517,6 +531,7 @@ class Invoices_model extends App_Model
                 }
             }
 
+
             update_sales_total_tax_column($insert_id, 'invoice', db_prefix() . 'invoices');
 
             if (!DEFINED('CRON') && $expense == false) {
@@ -528,13 +543,16 @@ class Invoices_model extends App_Model
             } else {
                 $lang_key = 'invoice_activity_recurring_from_expense_created';
             }
+
             $this->log_invoice_activity($insert_id, $lang_key);
 
             if ($save_and_send === true) {
                 $this->send_invoice_to_client($insert_id, '', true, '', true);
             }
-            hooks()->do_action('after_invoice_added', $insert_id);
+            
 
+            hooks()->do_action('after_invoice_added', $insert_id);
+   
             return $insert_id;
         }
 

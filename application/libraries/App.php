@@ -210,12 +210,12 @@ class App
      */
     public function get_table_data($table, $params = [])
     {
+
         $params = hooks()->apply_filters('table_params', $params, $table);
 
         foreach ($params as $key => $val) {
             $$key = $val;
         }
-
         $customFieldsColumns = [];
 
         $path = VIEWPATH . 'admin/tables/' . $table . EXT;
@@ -232,7 +232,10 @@ class App
             }
         }
 
-        include_once($path);
+         include_once($path);
+
+        // var_dump($output );
+        // exit();
 
         echo json_encode($output);
         die;

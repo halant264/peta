@@ -13,17 +13,22 @@ $table_data = array(
     'name'=>_l('invoice_dt_table_heading_client'),
     'th_attrs'=>array('class'=>(isset($client) ? 'not_visible' : ''))
   ),
-  _l('project'),
-  _l('tags'),
+  _l('car_name'),
+  _l('plate_number'),
   _l('invoice_dt_table_heading_duedate'),
   _l('invoice_dt_table_heading_status'));
+
 $custom_fields = get_custom_fields('invoice',array('show_on_table'=>1));
-foreach($custom_fields as $field){
+foreach($custom_fields as $field){ 
   array_push($table_data, [
    'name' => $field['name'],
    'th_attrs' => array('data-type'=>$field['type'], 'data-custom-field'=>1)
  ]);
 }
 $table_data = hooks()->apply_filters('invoices_table_columns', $table_data);
+
+// var_dump($class); exit();
+
 render_datatable($table_data, (isset($class) ? $class : 'invoices'));
+
 ?>

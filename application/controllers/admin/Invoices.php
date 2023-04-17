@@ -26,9 +26,11 @@ class Invoices extends AdminController
             access_denied('invoices');
         }
 
+
         close_setup_menu();
 
         $this->load->model('payment_modes_model');
+        $this->load->model('tasks_model');
         $data['payment_modes']        = $this->payment_modes_model->get('', [], true);
         $data['invoiceid']            = $id;
         $data['title']                = _l('invoices');
@@ -36,6 +38,9 @@ class Invoices extends AdminController
         $data['invoices_sale_agents'] = $this->invoices_model->get_sale_agents();
         $data['invoices_statuses']    = $this->invoices_model->get_statuses();
         $data['bodyclass']            = 'invoices-total-manual';
+        $data['invoices_task']    = $this->tasks_model->get_invoice_id($data['invoiceid']);
+        // var_dump($data['invoices_task']); exit(); 
+
         $this->load->view('admin/invoices/manage', $data);
     }
 
@@ -313,7 +318,9 @@ class Invoices extends AdminController
                     }
                 }
 
+                // var_dump($invoice_data); exit();
                 $id = $this->invoices_model->add($invoice_data);
+
                 if ($id) {
                     set_alert('success', _l('added_successfully', _l('invoice')));
                     $redUrl = admin_url('invoices/list_invoices/' . $id);
@@ -403,6 +410,8 @@ class Invoices extends AdminController
         $data['staff']     = $this->staff_model->get('', ['active' => 1]);
         $data['title']     = $title;
         $data['bodyclass'] = 'invoice';
+
+
         $this->load->view('admin/invoices/invoice', $data);
     }
 
@@ -464,6 +473,9 @@ class Invoices extends AdminController
         }
 
         $data['invoice'] = $invoice;
+        $data['invoice_car'] = $this->tasks_model->get_invoice_id($invoice->id);
+
+        // var_dump($data['invoice']); exit();
 
         $data['record_payment'] = false;
         $data['send_later']     = false;
@@ -700,6 +712,7 @@ class Invoices extends AdminController
         if ($this->input->get('print')) {
             $type = 'I';
         }
+        // var_dump(mb_strtoupper(slug_it($invoice_number))) ; exit(); 
 
         $pdf->Output(mb_strtoupper(slug_it($invoice_number)) . '.pdf', $type);
     }

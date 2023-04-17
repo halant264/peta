@@ -1,0 +1,27 @@
+public function get_checklist_car($taskid)
+    {
+        $this->db->where('taskid', $taskid);
+        $this->db->order_by('list_order', 'asc');
+        $task = $this->db->get(db_prefix() . 'task_checklist_items');
+        $task_list = $task ->result_array();
+        $task_list1 = $task->result();
+        $list_id= array();
+        foreach($task_list1 as $row){
+            if($row->car_listid != null){
+              $list_id[] = $row->car_listid;
+            }
+         }
+         $room = implode(",",$list_id);
+         $ids = explode(",", $room);
+
+
+        $this->db->select("*");
+        $this->db->from('car_checklist');
+        $this->db->where_not_in('id', $ids);
+        $query = $this->db->get();
+        $query =  $query->result_array();
+
+ 
+        // var_dump( $tasklist); exit();
+        return $query ;
+    }

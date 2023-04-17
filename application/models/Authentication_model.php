@@ -22,6 +22,7 @@ class Authentication_model extends App_Model
      */
     public function login($email, $password, $remember, $staff)
     {
+        
         if ((!empty($email)) and (!empty($password))) {
             $table = db_prefix() . 'contacts';
             $_id   = 'id';
@@ -32,6 +33,7 @@ class Authentication_model extends App_Model
             $this->db->where('email', $email);
             $user = $this->db->get($table)->row();
             if ($user) {
+                
                 // Email is okey lets check the password now
                 if (!app_hasher()->CheckPassword($password, $user->password)) {
                     hooks()->do_action('failed_login_attempt', [
@@ -66,7 +68,7 @@ class Authentication_model extends App_Model
                     'memberinactive' => true,
                 ];
             }
-
+           
             $twoFactorAuth = false;
             if ($staff == true) {
                 $twoFactorAuth = $user->two_factor_auth_enabled == 0 ? false : true;

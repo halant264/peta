@@ -36,6 +36,9 @@ foreach ($custom_fields as $key => $field) {
     array_push($join, 'LEFT JOIN ' . db_prefix() . 'customfieldsvalues as ctable_' . $key . ' ON ' . db_prefix() . 'clients.userid = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
 }
 
+
+
+
 $join = hooks()->apply_filters('customers_table_sql_join', $join);
 
 // Filter by custom groups
@@ -163,12 +166,16 @@ if (count($custom_fields) > 4) {
     @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
 }
 
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where
+, [
     db_prefix() . 'contacts.id as contact_id',
     'lastname',
     db_prefix() . 'clients.zip as zip',
     'registration_confirmed',
-]);
+]
+);
+
+
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -204,9 +211,9 @@ foreach ($rResult as $aRow) {
     if ($aRow['registration_confirmed'] == 0 && is_admin()) {
         $company .= ' | <a href="' . admin_url('clients/confirm_registration/' . $aRow['userid']) . '" class="text-success bold">' . _l('confirm_registration') . '</a>';
     }
-    if (!$isPerson) {
-        $company .= ' | <a href="' . admin_url('clients/client/' . $aRow['userid'] . '?group=contacts') . '">' . _l('customer_contacts') . '</a>';
-    }
+    // if (!$isPerson) {
+    //     $company .= ' | <a href="' . admin_url('clients/client/' . $aRow['userid'] . '?group=contacts') . '">' . _l('customer_contacts') . '</a>';
+    // }
     if ($hasPermissionDelete) {
         $company .= ' | <a href="' . admin_url('clients/delete/' . $aRow['userid']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
@@ -215,11 +222,11 @@ foreach ($rResult as $aRow) {
 
     $row[] = $company;
 
-    // Primary contact
-    $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . trim($aRow['fullname']) . '</a>' : '');
+    // // Primary contact
+    // $row[] = ($aRow['contact_id'] ? '<a href="' . admin_url('clients/client/' . $aRow['userid'] . '?contactid=' . $aRow['contact_id']) . '" target="_blank">' . trim($aRow['fullname']) . '</a>' : '');
 
-    // Primary contact email
-    $row[] = ($aRow['email'] ? '<a href="mailto:' . $aRow['email'] . '">' . $aRow['email'] . '</a>' : '');
+    // // Primary contact email
+    // $row[] = ($aRow['email'] ? '<a href="mailto:' . $aRow['email'] . '">' . $aRow['email'] . '</a>' : '');
 
     // Primary contact phone
     $row[] = ($aRow['phonenumber'] ? '<a href="tel:' . $aRow['phonenumber'] . '">' . $aRow['phonenumber'] . '</a>' : '');
@@ -236,15 +243,15 @@ foreach ($rResult as $aRow) {
     $row[] = $toggleActive;
 
     // Customer groups parsing
-    $groupsRow = '';
-    if ($aRow['customerGroups']) {
-        $groups = explode(',', $aRow['customerGroups']);
-        foreach ($groups as $group) {
-            $groupsRow .= '<span class="label label-default mleft5 customer-group-list pointer">' . $group . '</span>';
-        }
-    }
+    // $groupsRow = '';
+    // if ($aRow['customerGroups']) {
+    //     $groups = explode(',', $aRow['customerGroups']);
+    //     foreach ($groups as $group) {
+    //         $groupsRow .= '<span class="label label-default mleft5 customer-group-list pointer">' . $group . '</span>';
+    //     }
+    // }
 
-    $row[] = $groupsRow;
+    // $row[] = $groupsRow;
 
     $row[] = _dt($aRow['datecreated']);
 
@@ -262,6 +269,9 @@ foreach ($rResult as $aRow) {
     }
 
     $row = hooks()->apply_filters('customers_table_row_data', $row, $aRow);
+
+//     var_dump($row);
+// exit();
 
     $output['aaData'][] = $row;
 }

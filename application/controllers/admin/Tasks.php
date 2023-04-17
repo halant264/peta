@@ -293,7 +293,10 @@ class Tasks extends AdminController
             ajax_access_denied();
         }
 
+
         $data = [];
+
+
         // FOr new task add directly from the projects milestones
         if ($this->input->get('milestone_id')) {
             $this->db->where('id', $this->input->get('milestone_id'));
@@ -311,6 +314,7 @@ class Tasks extends AdminController
         if ($this->input->post()) {
             $data                = $this->input->post();
             $data['description'] = html_purify($this->input->post('description', false));
+            $data['customer_car'] = $this->input->post('customer_car');
             if ($id == '') {
                 if (!has_permission('tasks', '', 'create')) {
                     header('HTTP/1.0 400 Bad error');
@@ -320,6 +324,7 @@ class Tasks extends AdminController
                     ]);
                     die;
                 }
+            
                 $id      = $this->tasks_model->add($data);
                 $_id     = false;
                 $success = false;
@@ -369,6 +374,7 @@ class Tasks extends AdminController
             $title = _l('add_new', _l('task_lowercase'));
         } else {
             $data['task'] = $this->tasks_model->get($id);
+          
             if ($data['task']->rel_type == 'project') {
                 $data['milestones'] = $this->projects_model->get_milestones($data['task']->rel_id);
             }
@@ -388,6 +394,7 @@ class Tasks extends AdminController
         $data['members'] = $this->staff_model->get();
         $data['id']      = $id;
         $data['title']   = $title;
+
         $this->load->view('admin/tasks/task', $data);
     }
 
@@ -413,8 +420,24 @@ class Tasks extends AdminController
 
     public function get_billable_task_data($task_id)
     {
+        $this->load->model('cars_model');
         $task              = $this->tasks_model->get_billable_task_data($task_id);
-        $task->description = seconds_to_time_format($task->total_seconds) . ' ' . _l('hours');
+        $task->description = seconds_to_time_format($task->total_seconds) . ' ' . _l('hours') ." \r";
+        if($task->customer_car != ''){
+            $car = $this->cars_model->get_car($task->customer_car);
+            // $task->customer_car = $car['car'] ;
+            $task->description .= _l('car_name') .' : ' . $car['car']->car_name  ." \r" 
+            . _l('brand') .' : ' . $car['car']->brand_name  ." \r" 
+            . _l('model') .' : ' . $car['car']->model_name  ." \r" 
+            . _l('plate_number') .' : ' . $car['car']->plate_number  ." \r" 
+            . _l('plate_code') .' : ' . $car['car']->plate_code  ." \r" 
+            . _l('plate_source') .' : ' . $car['car']->plate_source  ." \r" 
+            ;
+            
+            // $task->customer_car = nl2br(htmlentities($task->customer_car )) ;
+        }
+        
+
         echo json_encode($task);
     }
 
@@ -426,6 +449,8 @@ class Tasks extends AdminController
     public function get_task_data($taskid, $return = false)
     {
         $tasks_where = [];
+        $this->load->model('cars_model');
+
 
         if (!has_permission('tasks', '', 'view')) {
             $tasks_where = get_tasks_where_string(false);
@@ -441,6 +466,9 @@ class Tasks extends AdminController
 
         $data['checklistTemplates'] = $this->tasks_model->get_checklist_templates();
         $data['task']               = $task;
+
+
+        $data['car_customer']       = $this->cars_model->get_car($task->customer_car)['car'];
         $data['id']                 = $task->id;
         $data['staff']              = $this->staff_model->get('', ['active' => 1]);
         $data['reminders']          = $this->tasks_model->get_reminders($taskid);
@@ -455,6 +483,8 @@ class Tasks extends AdminController
         if ($task->rel_type == 'project') {
             $data['project_deadline'] = get_project_deadline($task->rel_id);
         }
+
+      
 
         if ($return == false) {
             $this->load->view('admin/tasks/view_task_template', $data);
@@ -527,7 +557,7 @@ class Tasks extends AdminController
     public function save_checklist_item_template()
     {
         if (has_permission('checklist_templates', '', 'create')) {
-            $id = $this->tasks_model->add_checklist_template($this->input->post('description'));
+            $id = $this->tasks_model->add_checklist_template($this->input->post('description') ,$this->input->post('description_ar'), $this->input->post('description_en'));
             echo json_encode(['id' => $id]);
         }
     }
@@ -542,6 +572,7 @@ class Tasks extends AdminController
 
     public function init_checklist_items()
     {
+       
         if ($this->input->is_ajax_request()) {
             if ($this->input->post()) {
                 $post_data                       = $this->input->post();
@@ -551,6 +582,7 @@ class Tasks extends AdminController
                 $data['current_user_is_creator'] = $this->tasks_model->is_task_creator(get_staff_user_id(), $data['task_id']);
                 $data['hide_completed_items']    = get_staff_meta(get_staff_user_id(), 'task-hide-completed-items-' . $data['task_id']);
 
+      
                 $this->load->view('admin/tasks/checklist_items_template', $data);
             }
         }
@@ -580,6 +612,54 @@ class Tasks extends AdminController
         }
     }
 
+    public function get_customer_car($id)
+    {  
+        $this->load->model('cars_model');
+
+        $data =  $this->db->where(db_prefix() .'cars.id_customer', $id);
+        $data = $this->db->get(db_prefix() . 'cars')->result_array();
+
+        header('Content-Type: application/json');
+
+        echo json_encode( $data ) ;
+    }
+    public function get_customer_car_task($id)
+    {  
+
+        $this->load->model('cars_model');
+
+        $tasks =  $this->db->where(db_prefix() .'tasks.rel_id ', $id);
+        $tasks = $this->db->get(db_prefix() . 'tasks')->result();
+        ;
+     
+        $list_id= array();
+        foreach($tasks as $row){
+            $list_id[] = $row->customer_car;
+         }
+         $room = implode(",",$list_id);
+         $ids = explode(",", $room);
+
+        // $ignore = array(28,30);
+
+        $data =  $this->db->where(db_prefix() .'cars.id_customer', $id);
+        $data =  $this->db->where_not_in('id', $ids);
+        $data = $this->db->get(db_prefix() . 'cars')->result_array();
+
+        header('Content-Type: application/json');
+
+        echo json_encode( $data) ;
+    }
+    public function add_car_checklist_item()
+    {  
+        if ($this->input->is_ajax_request()) {
+            if ($this->input->post()) {
+                echo json_encode([
+                    'success' => "true",
+                    'data' => $this->tasks_model->add_checklistcar_item($this->input->post()),
+                ]);
+            }
+        }
+    }
     public function add_checklist_item()
     {
         if ($this->input->is_ajax_request()) {
@@ -589,6 +669,13 @@ class Tasks extends AdminController
                 ]);
             }
         }
+    }
+    public function get_checklistcar_item($id)
+    {
+        $list = $this->tasks_model->get_checklistcar_item($id);
+        echo json_encode([
+            'success' => $list 
+        ]);
     }
 
     public function update_checklist_order()
@@ -616,10 +703,13 @@ class Tasks extends AdminController
     {
         if ($this->input->is_ajax_request()) {
             if ($this->input->post()) {
-                $desc = $this->input->post('description');
-                $desc = trim($desc);
-                $this->tasks_model->update_checklist_item($this->input->post('listid'), $desc);
-                echo json_encode(['can_be_template' => (total_rows(db_prefix() . 'tasks_checklist_templates', ['description' => $desc]) == 0)]);
+                $desc_en = $this->input->post('description_en');
+                $desc_en = trim($desc_en);
+                $desc_ar = $this->input->post('description_ar');
+                $desc_ar = trim($desc_ar);
+                $this->tasks_model->update_checklist_item($this->input->post('listid'), $desc_en , $desc_ar);
+               //////////// 
+                echo json_encode(['can_be_template' => (total_rows(db_prefix() . 'tasks_checklist_templates', ['description' => $desc_en ]) == 0)]);
             }
         }
     }

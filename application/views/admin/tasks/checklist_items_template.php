@@ -25,23 +25,37 @@
         aria-valuemin="0" aria-valuemax="100" style="width:0%">
     </div>
 </div>
-<div class="tw-flex tw-flex-col">
-    <?php foreach ($checklists as $list) { ?>
+<style>
+    textarea[name=checklist-description] {
+    width:unset;
+}
+</style>
+<div class="tw-flex tw-flex-col" id="addlist">
+    <?php 
+    // var_dump($checklists); exit();
+     foreach ($checklists as $list) { ?>
     <div>
-        <div class="checklist" data-checklist-id="<?php echo $list['id']; ?>">
+        <div class="checklist" data-checklist-id="<?php echo $list['id']; ?>" data-checklistcar-id="<?php echo $list['car_listid']; ?>">
             <div class="tw-flex">
                 <div class="checkbox checkbox-success checklist-checkbox" data-toggle="tooltip" title="">
                     <input type="checkbox" <?php if ($list['finished'] == 1 && $list['finished_from'] != get_staff_user_id() && !is_admin()) {
-            echo ' disabled';
-        } ?> name="checklist-box" <?php if ($list['finished'] == 1) {
-            echo 'checked';
-        }; ?>>
-                    <label for=""><span class="hide"><?php echo $list['description']; ?></span></label>
+                            echo ' disabled';
+                        } ?> name="checklist-box" <?php if ($list['finished'] == 1) {
+                            echo 'checked';
+                        }; ?>>
+                    <label for=""><span class="hide"><?php echo $list['description_en']; ?> - <?php echo $list['description_ar']; ?></span></label>
                 </div>
                 <div class="tw-grow">
-                    <textarea data-taskid="<?php echo $task_id; ?>" name="checklist-description" rows="1" <?php if ($list['addedfrom'] != get_staff_user_id() && !has_permission('tasks', '', 'edit')) {
-            echo ' disabled';
-        } ?>><?php echo clear_textarea_breaks($list['description']); ?></textarea>
+                    <textarea class="text-en"  data-taskid="<?php echo $task_id; ?>" name="checklist-description" rows="1" 
+                    <?php if ($list['addedfrom'] != get_staff_user_id() && !has_permission('tasks', '', 'edit')) {
+                        echo ' disabled';
+                            } ?>><?php echo clear_textarea_breaks($list['description_en']); ?> 
+                    </textarea>
+                    <textarea class="text-ar"  data-taskid="<?php echo $task_id; ?>" name="checklist-description" rows="1" 
+                    <?php if ($list['addedfrom'] != get_staff_user_id() && !has_permission('tasks', '', 'edit')) {
+                        echo ' disabled';
+                            } ?>><?php echo clear_textarea_breaks($list['description_ar']); ?> 
+                    </textarea>
                 </div>
                 <div class="mleft10 tw-inline-flex tw-items-center tw-space-x-1 sm:tw-space-x-2">
                     <?php if (($list['addedfrom'] == get_staff_user_id() || $current_user_is_creator || is_admin()) && count($task_staff_members) > 0) { ?>
@@ -69,18 +83,17 @@
                         </ul>
                     </span>
                     <?php } ?>
-
                     <?php if (has_permission('checklist_templates', '', 'create')) { ?>
-                    <a href="#" class="tw-text-neutral-500 save-checklist-template<?php if ($list['description'] == '' || total_rows(db_prefix() . 'tasks_checklist_templates', ['description' => $list['description']]) > 0) {
-            echo ' hide';
-        } ?>" data-toggle="tooltip" data-title="<?php echo _l('save_as_template'); ?>"
-                        onclick="save_checklist_item_template(<?php echo $list['id']; ?>,this); return false;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="tw-w-5 tw-h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.251 2.251 0 00-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 00-9-9z" />
-                        </svg>
-                    </a>
+                        <a href="#" class="tw-text-neutral-500 save-checklist-template<?php if ($list['description_en'] == '' || total_rows(db_prefix() . 'tasks_checklist_templates', ['description' => $list['description_en']]) > 0) {
+                                echo ' hide';
+                            } ?>" data-toggle="tooltip" data-title="<?php echo _l('save_as_template'); ?>"
+                                            onclick="save_checklist_item_template(<?php echo $list['id']; ?>,this); return false;">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="tw-w-5 tw-h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.251 2.251 0 00-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 00-9-9z" />
+                            </svg>
+                        </a>
                     <?php } ?>
                     <?php if (has_permission('tasks', '', 'delete') || $list['addedfrom'] == get_staff_user_id()) { ?>
                     <a href="#" class="tw-text-neutral-500 remove-checklist"
@@ -94,30 +107,32 @@
                 </div>
             </div>
             <?php if ($list['finished'] == 1 || $list['addedfrom'] != get_staff_user_id() || !empty($list['assigned'])) { ?>
-            <p class="font-medium-xs mtop15 tw-text-neutral-500 checklist-item-info">
-                <?php
-                if ($list['addedfrom'] != get_staff_user_id()) {
-                    echo _l('task_created_by', get_staff_full_name($list['addedfrom']));
-                }
-                if ($list['addedfrom'] != get_staff_user_id() && $list['finished'] == 1) {
-                    echo ' - ';
-                }
-                if ($list['finished'] == 1) {
-                    echo _l('task_checklist_item_completed_by', get_staff_full_name($list['finished_from']));
-                }
-                if (($list['addedfrom'] != get_staff_user_id() || $list['finished'] == 1) && !empty($list['assigned'])) {
-                    echo ' - ';
-                }
-                if (!empty($list['assigned'])) {
-                    echo _l('task_checklist_assigned', get_staff_full_name($list['assigned']));
-                }
+                <p class="font-medium-xs mtop15 tw-text-neutral-500 checklist-item-info">
+                    <?php
+                    if ($list['addedfrom'] != get_staff_user_id()) {
+                        echo _l('task_created_by', get_staff_full_name($list['addedfrom']));
+                    }
+                    if ($list['addedfrom'] != get_staff_user_id() && $list['finished'] == 1) {
+                        echo ' - ';
+                    }
+                    if ($list['finished'] == 1) {
+                        echo _l('task_checklist_item_completed_by', get_staff_full_name($list['finished_from']));
+                    }
+                    if (($list['addedfrom'] != get_staff_user_id() || $list['finished'] == 1) && !empty($list['assigned'])) {
+                        echo ' - ';
+                    }
+                    if (!empty($list['assigned'])) {
+                        echo _l('task_checklist_assigned', get_staff_full_name($list['assigned']));
+                    }
 
-                ?>
-            </p>
+                    ?>
+                </p>
             <?php } ?>
         </div>
     </div>
     <?php } ?>
+    
+    
 </div>
 <script>
 $(function() {

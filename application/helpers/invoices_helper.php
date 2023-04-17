@@ -383,8 +383,11 @@ function update_invoice_status($id, $force_update = false, $prevent_logging = fa
         'status' => $status,
     ]);
 
+
     if ($CI->db->affected_rows() > 0) {
+
         hooks()->do_action('invoice_status_changed', ['invoice_id' => $id, 'status' => $status]);
+
 
         if ($prevent_logging == true) {
             return $status;

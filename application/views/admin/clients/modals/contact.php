@@ -76,7 +76,7 @@
                             echo 'selected';
                         } ?>></option>
                                 <option value="ltr" <?php if (isset($contact) && $contact->direction == 'ltr') {
-                            echo 'selected';
+                             'selecteechod';
                         } ?>>LTR</option>
                                 <option value="rtl" <?php if (isset($contact) && $contact->direction == 'rtl') {
                             echo 'selected';

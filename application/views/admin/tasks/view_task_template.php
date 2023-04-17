@@ -55,10 +55,12 @@
             <?php
       } ?>
             <?php if (!empty($task->rel_id)) {
-          echo '<div class="task-single-related-wrapper">';
+
+          echo '<div class="task-single-related-wrapper"> ';
           $task_rel_data  = get_relation_data($task->rel_type, $task->rel_id);
-          $task_rel_value = get_relation_values($task_rel_data, $task->rel_type);
-          echo '<h4 class="bold font-medium mbot15 tw-mt-0">' . _l('task_single_related') . ': <a href="' . $task_rel_value['link'] . '" target="_blank">' . $task_rel_value['name'] . '</a>';
+          $task_rel_value = get_relation_values($task_rel_data, $task->rel_type ,($task->customer_car !='')? $task->customer_car :'');
+         
+          echo ' <h4 class="bold font-medium mbot15 tw-mt-0">' . _l('task_single_related') . ': <a href="' . $task_rel_value['link'] . '" target="_blank">' . $task_rel_value['name'] . '</a>' . ($task_rel_value['car']!=''? ' - '.$task_rel_value['car']:"" ) ;
           if ($task->rel_type == 'project' && $task->milestone != 0) {
               echo '<div class="mtop5 mbot20 font-normal">' . _l('task_milestone') . ': ';
               $milestones = get_project_milestones($task->rel_id);
@@ -413,9 +415,9 @@
                         <?php $this->load->view(
                             'admin/tasks/checklist_items_template',
                             [
-                       'task_id'                 => $task->id,
-                       'current_user_is_creator' => $task->current_user_is_creator,
-                       'checklists'              => $task->checklist_items, ]
+                            'task_id'                  => $task->id,
+                            'current_user_is_creator' => $task->current_user_is_creator,
+                            'checklists'              => $task->checklist_items, ]
                         );
                        ?>
                     </div>
@@ -552,6 +554,7 @@
                 </div>
             </div>
             <?php } ?>
+            
             <hr />
             <a href="#" id="taskCommentSlide" onclick="slideToggle('.tasks-comments'); return false;">
                 <h4 class="mbot20 font-medium"><?php echo _l('task_comments'); ?></h4>
@@ -724,6 +727,51 @@
                     class="tw-text-neutral-500"><?php echo _l('task_created_at', '<span class="tw-text-neutral-600">' . _dt($task->dateadded) . '</span>'); ?></span>
                 <?php } ?>
             </p>
+            <div>
+                <?php if ($car_customer != null) { ?>
+                    <h4 class="task-info-heading tw-font-medium tw-text-base tw-mb-0 tw-text-neutral-800">
+                        <?php echo _l('car_info'); ?>
+                    </h4>
+                    <p class="tw-mb-0 task-info-created tw-text-sm">
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('car_name') ," : " , $car_customer->car_name ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('brand') ," : " , $car_customer->brand_name ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('model') ," : " , $car_customer->model_name ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('model_year')  ," : " ,  $car_customer->model_year ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo  _l('plate_source') ," : " , $car_customer->plate_source ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('plate_code')  ," : " , $car_customer->plate_code ?>
+                    </span>
+                    <br />
+                    <span
+                        class="tw-text-neutral-500">
+                        <?php echo _l('plate_number')  ," : " , $car_customer->plate_number ?>
+                    </span>
+                    <br />
+                    
+                </p>
+              <?php }  ?>
+            </div>
             <hr class="task-info-separator" />
             <div class="task-info task-status task-info-status">
                 <h5 class="tw-inline-flex tw-items-center tw-space-x-1.5">
@@ -1131,6 +1179,9 @@
     </div>
 </div>
 <script>
+
+
+
 if (typeof(commonTaskPopoverMenuOptions) == 'undefined') {
     var commonTaskPopoverMenuOptions = {
         html: true,

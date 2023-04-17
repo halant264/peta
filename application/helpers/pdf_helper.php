@@ -148,6 +148,7 @@ function get_pdf_format($option_name)
  */
 function invoice_pdf($invoice, $tag = '')
 {
+    
     return app_pdf('invoice', LIBSPATH . 'pdf/Invoice_pdf', $invoice, $tag);
 }
 /**

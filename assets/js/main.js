@@ -5925,6 +5925,7 @@ function update_checklist_order() {
 
 // New task checklist item
 function add_task_checklist_item(task_id, description, e) {
+  alert(description);
   if (e) {
     $(e).addClass("disabled");
   }
@@ -5986,6 +5987,7 @@ function delete_checklist_item(id, field) {
 
 // Fetches task checklist items.
 function init_tasks_checklist_items(is_new, task_id) {
+  
   $.post(admin_url + "tasks/init_checklist_items", {
     taskid: task_id,
   }).done(function (data) {
@@ -6512,6 +6514,7 @@ function timer_action(e, task_id, timer_id, adminStop) {
 
 // Init task modal and get data from server
 function init_task_modal(task_id, comment_id) {
+  console.log("ss");
   var queryStr = "";
   var $leadModal = $("#lead-modal");
   var $taskAddEditModal = $("#_task_modal");

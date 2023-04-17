@@ -111,6 +111,8 @@ function get_client($id = null)
  */
 function get_customer_profile_tabs()
 {
+   
+
     return get_instance()->app_tabs->get_customer_profile_tabs();
 }
 
@@ -122,6 +124,8 @@ function get_customer_profile_tabs()
  */
 function filter_client_visible_tabs($tabs, $id = '')
 {
+
+    
     $newTabs               = [];
     $customerProfileBadges = null;
 
@@ -143,12 +147,15 @@ function filter_client_visible_tabs($tabs, $id = '')
                 continue;
             }
         }
+    
 
         if (!is_null($customerProfileBadges)) {
             $tab['badge'] = $customerProfileBadges->getBadge($tab['slug']);
         }
 
         $newTabs[$key] = $tab;
+
+   
     }
 
     return hooks()->apply_filters('client_filtered_visible_tabs', $newTabs);
@@ -193,10 +200,10 @@ function app_init_customer_profile_tabs()
         'badge'    => [],
     ]);
 
-    $CI->app_tabs->add_customer_profile_tab('contacts', [
-        'name'     => !is_empty_customer_company($client_id) || empty($client_id) ? _l('customer_contacts') : _l('contact'),
-        'icon'     => 'fa fa-user',
-        'view'     => 'admin/clients/groups/contacts',
+    $CI->app_tabs->add_customer_profile_tab('car', [
+        'name'     => !is_empty_customer_company($client_id) || empty($client_id) ? _l('car') : _l('car'),
+        'icon'     => 'fa fa-car',
+        'view'     => 'admin/clients/groups/car',
         'position' => 10,
         'badge'    => [],
     ]);

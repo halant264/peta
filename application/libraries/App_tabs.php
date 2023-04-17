@@ -13,22 +13,26 @@ class App_tabs
     public function __construct()
     {
         $this->ci = &get_instance();
+        
     }
 
     public function add_customer_profile_tab($slug, $tab)
     {
         $this->add($slug, $tab, 'customer_profile');
-
+       
         return $this;
     }
 
     public function get_customer_profile_tabs()
     {
+        
         return $this->get('customer_profile');
     }
 
     public function add_project_tab($slug, $tab)
     {
+       
+
         $this->add($slug, $tab, 'project');
 
         return $this;
@@ -36,13 +40,14 @@ class App_tabs
 
     public function add_project_tab_children_item($parent_slug, $tab)
     {
+        
         $this->add_child($parent_slug, $tab, 'project');
-
+       
         return $this;
     }
 
     public function get_project_tabs()
-    {
+    {  
         return $this->get('project');
     }
 
@@ -55,6 +60,8 @@ class App_tabs
 
     public function add_settings_tab_children_item($parent_slug, $tab)
     {
+       
+
         $this->add_child($parent_slug, $tab, 'settings');
 
         return $this;
@@ -79,7 +86,7 @@ class App_tabs
     {
         $tab = app_fill_empty_common_attributes($tab);
         $tab = ['slug' => $slug] + $tab;
-
+       
         $this->tabs[$group][$slug] = $tab;
     }
 
@@ -103,7 +110,7 @@ class App_tabs
         if ((!isset($this->child[$group][$parent_slug]) || !is_array($this->child[$group][$parent_slug]))) {
             $this->child[$group][$parent_slug] = [];
         }
-
+      
         $this->child[$group][$parent_slug][] = $tab;
     }
 
@@ -111,17 +118,19 @@ class App_tabs
     {
         hooks()->do_action('before_get_tabs', $group);
 
-        $tabs = isset($this->tabs[$group]) ? $this->tabs[$group] : [];
+        // var_dump($this); exit( );
+        $tabs = isset($this->tabs[$group]) ? $this->tabs[$group] : [];     
 
         foreach ($tabs as $parent => $item) {
             $tabs[$parent]['badge'] = isset($tabs[$parent]['badge']) ? $tabs[$parent]['badge'] : [];
             $tabs[$parent]['children'] = $this->get_child($parent, $group);
         }
-
+        
         $tabs = hooks()->apply_filters("{$group}_tabs", $tabs);
 
         $tabs = $this->filter_visible_tabs($tabs);
 
+        
         return app_sort_by_position($tabs);
     }
 

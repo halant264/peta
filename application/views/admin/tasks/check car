@@ -1,0 +1,73 @@
+<hr />
+            <a href="#" id="" onclick="slideToggle('.tasks-car_list'); return false;">
+                <h4 class="mbot20 font-medium"><?php echo _l('task_car_list'); ?></h4>
+            </a>
+            <div id="tasks-car_list" class="tasks-car_list inline-block full-width simple-editor" style="display:none";>
+            <?php  
+                foreach ($task->checklist_car as $list) { ?>
+                <div class="checklistclass" data-carlist="<?php echo $list['id']; ?>">
+                    <div class="checklist" data-checklist-id="<?php echo $list['id']; ?>">
+                        <div class="tw-flex">
+                            <div class="" data-toggle="tooltip" title="">
+                            <a href="#" onclick="add_car_checklist_item('<?php echo $list['id']; ?>', <?php echo $task->id; ?> , this); return false"
+                                class="mbot10 inline-block">
+                                <span class="new-checklist-item">
+                                <!-- <input type="checkbox" <?php if ($list['is_check'] == 1 ) {
+                                            echo ' checked';
+                                        } ?> name="checklist-box"> -->
+                                        <i class="fa fa-plus-circle"></i>
+                                </span>
+                            </a>
+                                <label for=""><span class="hidee"><?php echo $list['check_name_en']; ?></span></label> -
+                                <label for=""><span class="hidee"><?php echo $list['check_name_ar']; ?></span></label>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <?php } ?>
+            </div>
+
+
+            function return_car_checklist_item(i , e){
+    requestGetJSON("tasks/get_checklistcar_item/"+i)
+    .done((function(e){
+        // returndata =  JSON.parse(e);
+        console.log(e.success['id']);
+        $("#tasks-car_list").append(
+        '<div class="checklistclass" data-carlist="'+e.success['id']+'">'+
+            '<div class="checklist" data-checklist-id="'+e.success['id']+'">'+
+                '<div class="tw-flex">'+
+                    '<div class="" data-toggle="tooltip" title="">'+
+                    '<a href="#" onclick="add_car_checklist_item('+e.success['id']+', '+e+' , this); return false"'+
+                        'class="mbot10 inline-block">'+
+                        '<span class="new-checklist-item">'+
+                            '<i class="fa fa-plus-circle"></i>'+
+                        '</span>'+
+                    '</a>'+
+                        '<label for=""><span class="hidee">'+e.success['check_name_en']+'</span></label> -'+
+                        '<label for=""><span class="hidee">'+e.success['check_name_ar']+'</span></label>'+
+                    '</div>'+
+                    
+                '</div>'+
+            '</div>'+
+        '</div>'
+    );
+    }))
+    
+
+}
+function add_car_checklist_item(e , d , a){
+    carlistid = $("[data-carlist="+e+"]") ;
+    a&&$(a).addClass("disabled");
+    $.post(admin_url+"tasks/add_car_checklist_item",{
+        taskid:d,carlistid:e
+    }).done((function(w){
+        returndata =  JSON.parse(w);
+        init_tasks_checklist_items(!0,d)
+        carlistid.remove() ;
+    })).always((function(){
+            a&&$(a).removeClass("disabled")
+        }))
+
+}

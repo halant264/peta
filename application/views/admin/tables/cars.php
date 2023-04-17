@@ -2,6 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+
 // $total_client_contacts = total_rows(db_prefix() . 'cars', ['id_customer' => $client_id]);
 $total_client_contacts = total_rows(db_prefix() . 'cars', ['id_customer' => $client_id]);
 $this->ci->load->model('gdpr_model');
@@ -15,21 +16,21 @@ $aColumns        = [];
 // }
 $aColumns = array_merge( $aColumns , [
     db_prefix() .'cars.car_name as car_name',
-    db_prefix() .'brand.brand_name as brand_name',
-    db_prefix() .'brand_model.model_name as model_name',
+    db_prefix() .'cars.id_brand as car_id_brand',
+    db_prefix() .'cars.id_model as id_model',
     db_prefix() .'cars.model_year as model_year',
     db_prefix() .'cars.plate_source as plate_source',
     db_prefix() .'cars.plate_code as plate_code',
     db_prefix() .'cars.plate_number as plate_number',
-    db_prefix() .'cars.id as id',
-
 ]);
-
-
+    // db_prefix() .'brand.brand_name as brand_name',
+    // db_prefix() .'brand_model.model_name as model_name',
+    // db_prefix() . 'cars.id as id',
+    // db_prefix() .'cars.id_customer as id_customer',
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'cars';
-$join         = ['INNER JOIN ' .db_prefix() . 'brand '  . 'ON ' . db_prefix() .'cars.id_brand ='.db_prefix() .'brand.id INNER JOIN ' .db_prefix() .'brand_model ON ' .db_prefix() .'brand_model.id = ' .db_prefix() .'cars.id_model'   ];
+$join         = ['INNER JOIN ' . db_prefix() . 'brand '  . 'ON ' . db_prefix() .'cars.id_brand =' .db_prefix() .'brand.id INNER JOIN ' .db_prefix() .'brand_model ON ' .db_prefix() .'brand_model.id = ' .db_prefix() .'cars.id_model'   ];
 
 $custom_fields = get_table_custom_fields('cars');
 
@@ -44,9 +45,6 @@ foreach ($custom_fields as $key => $field) {
 
 $where = ['AND '.db_prefix().'cars.id_customer=' . $this->ci->db->escape_str($client_id)];
 
-// var_dump($custom_fields);
-// exit();
-
 
 
 // Fix for big queries. Some hosting have max_join_limit
@@ -56,11 +54,13 @@ if (count($custom_fields) > 4) {
 
 
 
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where);
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where );
 
 
+// car_name	brand	model	model_year	
 
- 
+// var_dump("d" );
+// exit();
 
 
 $output  = $result['output'];
@@ -70,23 +70,22 @@ $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
 
- 
     $row = [];
 
     $rowName = /*'<img src="' . contact_profile_image_url($aRow['id']) . '" class="client-profile-image-small mright5">*/'<a href="#" onclick="contact_car(' . $aRow['id_customer'] . ',' . $aRow['id'] . ');return false;">' . $aRow['car_name'] . '</a>';
 
     $rowName .= '<div class="row-options Xtw-ml-9">';
 
-    $rowName .= '<a href="#" onclick="contact_car(' . $client_id . ',' . $aRow['id'] . ');return false;">' . _l('edit') . '</a>';
+    $rowName .= '<a href="#" onclick="contact_car(' . $aRow['id_customer'] . ',' . $aRow['id'] . ');return false;">' . _l('edit') . '</a>';
 
-    // if (is_gdpr() &&  is_admin()) {
-    //     $rowName .= ' | <a href="' . admin_url('clients/export/' . $aRow['id']) . '">
-    //          ' . _l('dt_button_export') . ' (' . _l('gdpr_short') . ')
-    //       </a>';
-    // }
+    if (is_gdpr() &&  is_admin()) {
+        $rowName .= ' | <a href="' . admin_url('clients/export/' . $aRow['id']) . '">
+             ' . _l('dt_button_export') . ' (' . _l('gdpr_short') . ')
+          </a>';
+    }
 
-    if (has_permission('customers', '', 'delete') || is_customer_admin($client_id)) {
-            $rowName .= ' | <a href="' . admin_url('clients/delete_car/' . $client_id . '/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+    if (has_permission('customers', '', 'delete') || is_customer_admin($aRow['id_customer'])) {
+            $rowName .= ' | <a href="' . admin_url('clients/delete_car/' . $aRow['id_customer'] . '/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 
     $rowName .= '</div>';
@@ -119,12 +118,12 @@ foreach ($rResult as $aRow) {
     
 
     // Custom fields add values
-    foreach ($customFieldsColumns as $customFieldColumn) {
-        $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
-    }
+    // foreach ($customFieldsColumns as $customFieldColumn) {
+    //     $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
+    // }
 
-    $row['DT_RowClass'] = 'has-row-options';
-    $output['aaData'][] = $row;
+    // $row['DT_RowClass'] = 'has-row-options';
+    // $output['aaData'][] = $row;
 
 
 

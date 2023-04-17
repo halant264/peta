@@ -39,8 +39,8 @@
                         </li>
                         <li class="divider"></li>
                         <li class="<?php if ($this->input->get('filter') == 'not_sent') {
-    echo 'active';
-} ?>">
+                                echo 'active';
+                            } ?>">
                             <a href="#" data-cview="not_sent"
                                 onclick="dt_custom_view('not_sent','.table-invoices','not_sent'); return false;">
                                 <?php echo _l('not_sent_indicator'); ?>
@@ -61,8 +61,8 @@
                         <li class="divider"></li>
                         <?php foreach ($invoices_statuses as $status) { ?>
                         <li class="<?php if ($status == $this->input->get('status')) {
-    echo 'active';
-} ?>">
+                                echo 'active';
+                            } ?>">
                             <a href="#" data-cview="invoices_<?php echo $status; ?>"
                                 onclick="dt_custom_view('invoices_<?php echo $status; ?>','.table-invoices','invoices_<?php echo $status; ?>'); return false;"><?php echo format_invoice_status($status, '', false); ?></a>
                         </li>
@@ -98,9 +98,9 @@
                         <li class="divider"></li>
                         <?php } ?>
                         <?php foreach ($payment_modes as $mode) {
-    if (total_rows(db_prefix() . 'invoicepaymentrecords', ['paymentmode' => $mode['id']]) == 0) {
-        continue;
-    } ?>
+                            if (total_rows(db_prefix() . 'invoicepaymentrecords', ['paymentmode' => $mode['id']]) == 0) {
+                                continue;
+                            } ?>
                         <li>
                             <a href="#" data-cview="invoice_payments_by_<?php echo $mode['id']; ?>"
                                 onclick="dt_custom_view('<?php echo $mode['id']; ?>','.table-invoices','invoice_payments_by_<?php echo $mode['id']; ?>'); return false;">
@@ -108,7 +108,7 @@
                             </a>
                         </li>
                         <?php
-} ?>
+                            } ?>    
                     </ul>
                 </div>
                 <a href="#" class="btn btn-default btn-with-tooltip toggle-small-view hidden-xs"

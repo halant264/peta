@@ -316,6 +316,8 @@ if (!class_exists('Hooks')){
      */
     public function do_action($tag, $arg = '') {
 
+      
+
       if ( ! isset($this->actions) )
         $this->actions = array();
 
@@ -330,13 +332,13 @@ if (!class_exists('Hooks')){
         $all_args = func_get_args();
         $this->_call_all_hook($all_args);
       }
-
+     
       if ( !isset($this->filters[$tag]) ) {
         if ( isset($this->filters['all']) )
           array_pop($this->current_filter);
         return;
       }
-
+     
       if ( !isset($this->filters['all']) )
         $this->current_filter[] = $tag;
 
@@ -353,15 +355,17 @@ if (!class_exists('Hooks')){
         ksort($this->filters[$tag]);
         $this->merged_filters[ $tag ] = true;
       }
-
+     
       reset( $this->filters[ $tag ] );
 
       do {
         foreach ( (array) current($this->filters[$tag]) as $the_ )
-          if ( !is_null($the_['function']) )
-            call_user_func_array($the_['function'], array_slice($args, 0, (int) $the_['accepted_args']));
+ 
+            if ( !is_null($the_['function']) )
+              call_user_func_array($the_['function'], array_slice($args, 0, (int) $the_['accepted_args']));
 
       } while ( next($this->filters[$tag]) !== false );
+   
 
       array_pop($this->current_filter);
     }

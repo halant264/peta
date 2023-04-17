@@ -153,21 +153,27 @@ function get_relation_data($type, $rel_id = '', $extra = [])
  * @param  string $type
  * @return mixed
  */
-function get_relation_values($relation, $type)
+function get_relation_values($relation, $type , $customer_car = '')
 {
+    $CI = & get_instance();
+    $CI->load->model('cars_model');
+
     if ($relation == '') {
         return [
             'name'      => '',
             'id'        => '',
             'link'      => '',
+            'car'      => '',
             'addedfrom' => 0,
             'subtext'   => '',
             ];
     }
 
+
     $addedfrom = 0;
     $name      = '';
     $id        = '';
+    $car        = '';
     $link      = '';
     $subtext   = '';
 
@@ -175,9 +181,18 @@ function get_relation_values($relation, $type)
         if (is_array($relation)) {
             $id   = $relation['userid'];
             $name = $relation['company'];
+            if($customer_car != ''){
+                $c_car= $CI->cars_model->get_customer_car($customer_car); 
+                $car = $c_car->car_name;
+            }
+            
         } else {
             $id   = $relation->userid;
             $name = $relation->company;
+            if($customer_car != ''){
+                $c_car= $CI->cars_model->get_customer_car($customer_car); 
+                $car = $c_car->car_name;
+            }
         }
         $link = admin_url('clients/client/' . $id);
     } elseif ($type == 'contact' || $type == 'contacts') {
@@ -331,6 +346,7 @@ function get_relation_values($relation, $type)
         'id'        => $id,
         'name'      => $name,
         'link'      => $link,
+        'car'      => $car,
         'addedfrom' => $addedfrom,
         'subtext'   => $subtext,
         'type'      => $type,

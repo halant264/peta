@@ -608,6 +608,7 @@
                         <td>
                             <input type="number" name="quantity" min="0" value="1" class="form-control"
                                 placeholder="<?php echo _l('item_quantity_placeholder'); ?>">
+                            <input type="hidden" name="task_id_car"  value="" >
                             <input type="text" placeholder="<?php echo _l('unit'); ?>" data-toggle="tooltip"
                                 data-title="e.q kg, lots, packs" name="unit"
                                 class="form-control input-transparent text-right">
@@ -635,17 +636,20 @@
                         ?>
                         </td>
                         <td></td>
+                        <td></td>
+                        <td></td>
                         <td>
-                            <?php
-                        $new_item = 'undefined';
-                        if (isset($invoice)) {
-                            $new_item = true;
-                        }
-                        ?>
-                            <button type="button"
-                                onclick="add_item_to_table('undefined','undefined',<?php echo $new_item; ?>); return false;"
-                                class="btn pull-right btn-primary"><i class="fa fa-check"></i></button>
+                                <?php
+                            $new_item = 'undefined';
+                            if (isset($invoice)) {
+                                $new_item = true;
+                            }
+                            ?>
+                                <button type="button"
+                                    onclick="add_item_to_table('undefined','undefined',<?php echo $new_item; ?>); return false;"
+                                    class="btn pull-right btn-primary"><i class="fa fa-check"></i></button>
                         </td>
+                        
                     </tr>
                     <?php if (isset($invoice) || isset($add_items)) {
                             $i               = 1;
@@ -713,6 +717,7 @@
                 </tbody>
             </table>
         </div>
+
         <div class="col-md-8 col-md-offset-4">
             <table class="table text-right">
                 <tbody>

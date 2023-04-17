@@ -2,7 +2,8 @@
 <?php init_head(); ?>
 <div id="wrapper" class="customer_profile">
     <div class="content">
-        <div class="row">
+        <div class="row"> 
+      
             <div class="col-md-3">
                 <?php if (isset($client) && $client->registration_confirmed == 0 && is_admin()) { ?>
                 <div class="alert alert-warning">
@@ -73,14 +74,16 @@
                 </h4>
                 <?php } ?>
             </div>
+           
             <div class="clearfix"></div>
-
+          
             <?php if (isset($client)) { ?>
             <div class="col-md-3">
                 <?php $this->load->view('admin/clients/tabs'); ?>
             </div>
             <?php } ?>
 
+      
             <div class="tw-mt-12 sm:tw-mt-0 <?php echo isset($client) ? 'col-md-9' : 'col-md-8 col-md-offset-2'; ?>">
                 <div class="panel_s">
                     <div class="panel-body">
@@ -98,9 +101,9 @@
                     <?php if ($group == 'profile') { ?>
                     <div class="panel-footer text-right tw-space-x-1" id="profile-save-section">
                         <?php if (!isset($client)) { ?>
-                        <button class="btn btn-default save-and-add-contact customer-form-submiter">
+                        <!-- <button class="btn btn-default save-and-add-contact customer-form-submiter">
                             <?php echo _l('save_customer_and_add_contact'); ?>
-                        </button>
+                        </button> -->
                         <?php } ?>
                         <button class="btn btn-primary only-save customer-form-submiter">
                             <?php echo _l('submit'); ?>
@@ -109,6 +112,7 @@
                     <?php } ?>
                 </div>
             </div>
+
         </div>
 
     </div>

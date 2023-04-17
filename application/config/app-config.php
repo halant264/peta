@@ -17,7 +17,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 * environments.
 *
 */
-define('APP_BASE_URL', 'http://localhost/install/perfex_crm/');
+define('APP_BASE_URL', 'http://192.168.1.11/install/perfex_crm/');
 
 /*
 * --------------------------------------------------------------------------

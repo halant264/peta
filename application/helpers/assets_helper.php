@@ -222,5 +222,6 @@ function app_compile_css($group = 'admin')
 
 function app_compile_scripts($group = 'admin')
 {
+    
     return get_instance()->app_scripts->compile($group);
 }

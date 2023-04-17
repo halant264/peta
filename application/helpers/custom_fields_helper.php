@@ -334,9 +334,11 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
  */
 function get_custom_fields($field_to, $where = [], $exclude_only_admin = false)
 {
+    
     $is_admin = is_admin();
     $CI       = & get_instance();
     $CI->db->where('fieldto', $field_to);
+
     if ((is_array($where) && count($where) > 0) || (!is_array($where) && $where != '')) {
         $CI->db->where($where);
     }
@@ -351,6 +353,8 @@ function get_custom_fields($field_to, $where = [], $exclude_only_admin = false)
     foreach ($results as $key => $result) {
         $results[$key]['name'] = _maybe_translate_custom_field_name($result['name'], $result['slug']);
     }
+
+
 
     return $results;
 }

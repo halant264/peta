@@ -552,6 +552,7 @@ function get_items_by_type($type, $id)
     $CI->db->where('rel_type', $type);
     $CI->db->order_by('item_order', 'asc');
 
+    // var_dump();
     return $CI->db->get()->result_array();
 }
 /**

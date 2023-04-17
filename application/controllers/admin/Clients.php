@@ -7,17 +7,20 @@ class Clients extends AdminController
     /* List all clients */
     public function index()
     {
+        
         if (!has_permission('customers', '', 'view')) {
             if (!have_assigned_customers() && !has_permission('customers', '', 'create')) {
                 access_denied('customers');
             }
         }
-
+     
         $this->load->model('contracts_model');
+        $this->load->model('clients_model');
+       
         $data['contract_types'] = $this->contracts_model->get_contract_types();
         $data['groups']         = $this->clients_model->get_groups();
         $data['title']          = _l('clients');
-
+    
         $this->load->model('proposals_model');
         $data['proposal_statuses'] = $this->proposals_model->get_statuses();
 
@@ -36,16 +39,27 @@ class Clients extends AdminController
         if (!has_permission('customers', '', 'view')) {
             $whereContactsLoggedIn = ' AND userid IN (SELECT customer_id FROM ' . db_prefix() . 'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
         }
-
+        
         $data['contacts_logged_in_today'] = $this->clients_model->get_contacts('', 'last_login LIKE "' . date('Y-m-d') . '%"' . $whereContactsLoggedIn);
 
         $data['countries'] = $this->clients_model->get_clients_distinct_countries();
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('all_contacts');
+        }
+
+        if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') {
+            $this->load->model('gdpr_model');
+            $data['consent_purposes'] = $this->gdpr_model->get_consent_purposes();
+        }
+
+        $data['title'] = _l('customer_contacts');
 
         $this->load->view('admin/clients/manage', $data);
     }
 
     public function table()
     {
+        
         if (!has_permission('customers', '', 'view')) {
             if (!have_assigned_customers() && !has_permission('customers', '', 'create')) {
                 ajax_access_denied();
@@ -61,12 +75,30 @@ class Clients extends AdminController
             $this->app->get_table_data('all_contacts');
         }
 
+        // var_dump($this->app->get_table_data('all_contacts')); exit();
+
         if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') {
             $this->load->model('gdpr_model');
             $data['consent_purposes'] = $this->gdpr_model->get_consent_purposes();
         }
 
-        $data['title'] = _l('customer_contacts');
+        // $data['title'] = _l('customeyr_contacts');
+        $data['title'] = _l('Cars');
+        $this->load->view('admin/clients/all_contacts', $data);
+    }
+    public function all_cars()
+    {
+        // if ($this->input->is_ajax_request()) {
+        //     $this->app->get_table_data('all_contacts');
+        // }
+
+        // if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') {
+        //     $this->load->model('gdpr_model');
+        //     $data['consent_purposes'] = $this->gdpr_model->get_consent_purposes();
+        // }
+
+
+        $data['title'] = _l('customer_cars');
         $this->load->view('admin/clients/all_contacts', $data);
     }
 
@@ -135,6 +167,8 @@ class Clients extends AdminController
         } else {
             $client                = $this->clients_model->get($id);
             $data['customer_tabs'] = get_customer_profile_tabs($id);
+// var_dump(get_customer_profile_tabs($id)); exit();`
+// var_dump($data['customer_tabs']); exit();
 
             if (!$client) {
                 show_404();
@@ -142,6 +176,8 @@ class Clients extends AdminController
 
             $data['contacts'] = $this->clients_model->get_contacts($id);
             $data['tab']      = isset($data['customer_tabs'][$group]) ? $data['customer_tabs'][$group] : null;
+
+          
 
             if (!$data['tab']) {
                 show_404();
@@ -301,9 +337,130 @@ class Clients extends AdminController
             echo 'false';
         }
     }
+    public function form_contact_car($customer_id, $contact_id = '')
+    {
 
+        
+        
+        if (!has_permission('customers', '', 'view')) {
+            if (!is_customer_admin($customer_id)) {
+                echo _l('access_denied');
+                die;
+            }
+        }
+        $data['customer_id'] = $customer_id;
+        $data['contactid']   = $contact_id;
+
+        $this->load->model('cars_model');
+
+        if ($this->input->post()) {
+            $data     = $this->input->post();
+            unset($data['contactid']);
+            if ($contact_id == '') {
+                if (!has_permission('customers', '', 'create')) {
+                    if (!is_customer_admin($customer_id)) {
+                        header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
+                        echo json_encode([
+                            'success' => false,
+                            'message' => _l('access_denied'),
+                        ]);
+                        die;
+                    }
+                }
+                $id      = $this->cars_model->add_contact($data, $customer_id);
+                $message = '';
+                $success = false;
+                if ($id) {
+                    // set_alert('success', _l('added_successfully', _l('car')));
+                    //     redirect(admin_url('clients/client/' . $customer_id .'?group=car'));
+                    $success = true;
+                    $message = _l('added_successfully', _l('contact'));
+                }
+                echo json_encode([
+                    'success'             => $success,
+                    'message'             => $message,
+                ]);
+                die;
+           
+            }
+         
+            if (!has_permission('customers', '', 'edit')) {
+                if (!is_customer_admin($customer_id)) {
+                    header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
+                    echo json_encode([
+                            'success' => false,
+                            'message' => _l('access_denied'),
+                        ]);
+                    die;
+                }
+            }
+         
+            $original_contact = $this->cars_model->get_car($contact_id);
+            $success          = $this->cars_model->update($data, $contact_id);
+            $message          = '';
+            $proposal_warning = false;
+            $original_email   = '';
+            $updated          = false;
+       
+            if (is_array($success)) {
+            } else {
+                if ($success == true) {
+                    $updated = true;
+                    $message = _l('updated_successfully', _l('car'));
+                }
+            }
+            if ($updated == true) {
+                $contact = $this->cars_model->get_car($contact_id);
+            }
+            echo json_encode([
+                    'success'             => $success,
+                    'message'             => $message,
+
+                ]);
+            die;
+        }
+        $data['calling_code'] = $callingCode;
+        if ($contact_id == '') {
+            $title = _l('add_new_car', _l('contact_lowercase'));
+        } else {
+            $data['contact'] = $this->cars_model->get_car($contact_id);
+            $data['contact']['car'] = $data['contact']['car'];
+            $data['contact']['model'] = $data['contact']['model'];
+
+            if (!$data['contact']) {
+                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Contact Not Found',
+                ]);
+                die;
+            }
+            $title = $data['contact']['car']->car_name ;
+        }
+
+        $data['customer_permissions'] = get_contact_permissions();
+        $data['title']                = $title;
+
+        $this->load->view('admin/clients/modals/car', $data);
+    }
+    public function delete_car($customer_id, $id)
+    {
+        $this->load->model('cars_model');
+        if (!has_permission('customers', '', 'delete')) {
+            if (!is_customer_admin($customer_id)) {
+                access_denied('customers');
+            }
+        }
+        $contact      = $this->cars_model->get_car($id);
+
+        $this->cars_model->delete_car($id);
+
+        redirect(admin_url('clients/client/' . $customer_id . '?group=car'));
+    }
     public function form_contact($customer_id, $contact_id = '')
     {
+        // var_dump("add contact");
+        // exit();
         if (!has_permission('customers', '', 'view')) {
             if (!is_customer_admin($customer_id)) {
                 echo _l('access_denied');
@@ -356,87 +513,29 @@ class Clients extends AdminController
                 echo json_encode([
                     'success'             => $success,
                     'message'             => $message,
-                    'has_primary_contact' => (total_rows(db_prefix() . 'contacts', ['userid' => $customer_id, 'is_primary' => 1]) > 0 ? true : false),
-                    'is_individual'       => is_empty_customer_company($customer_id) && total_rows(db_prefix() . 'contacts', ['userid' => $customer_id]) == 1,
+                    // 'has_primary_contact' => (total_rows(db_prefix() . 'contacts', ['userid' => $customer_id, 'is_primary' => 1]) > 0 ? true : false),
+                    // 'is_individual'       => is_empty_customer_company($customer_id) && total_rows(db_prefix() . 'contacts', ['userid' => $customer_id]) == 1,
                 ]);
                 die;
             }
-            if (!has_permission('customers', '', 'edit')) {
-                if (!is_customer_admin($customer_id)) {
-                    header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
-                    echo json_encode([
-                            'success' => false,
-                            'message' => _l('access_denied'),
-                        ]);
-                    die;
-                }
-            }
-            $original_contact = $this->clients_model->get_contact($contact_id);
-            $success          = $this->clients_model->update_contact($data, $contact_id);
-            $message          = '';
-            $proposal_warning = false;
-            $original_email   = '';
-            $updated          = false;
-            if (is_array($success)) {
-                if (isset($success['set_password_email_sent'])) {
-                    $message = _l('set_password_email_sent_to_client');
-                } elseif (isset($success['set_password_email_sent_and_profile_updated'])) {
-                    $updated = true;
-                    $message = _l('set_password_email_sent_to_client_and_profile_updated');
-                }
-            } else {
-                if ($success == true) {
-                    $updated = true;
-                    $message = _l('updated_successfully', _l('contact'));
-                }
-            }
-            if (handle_contact_profile_image_upload($contact_id) && !$updated) {
-                $message = _l('updated_successfully', _l('contact'));
-                $success = true;
-            }
-            if ($updated == true) {
-                $contact = $this->clients_model->get_contact($contact_id);
-                if (total_rows(db_prefix() . 'proposals', [
-                        'rel_type' => 'customer',
-                        'rel_id' => $contact->userid,
-                        'email' => $original_contact->email,
-                    ]) > 0 && ($original_contact->email != $contact->email)) {
-                    $proposal_warning = true;
-                    $original_email   = $original_contact->email;
-                }
-            }
-            echo json_encode([
-                    'success'             => $success,
-                    'proposal_warning'    => $proposal_warning,
-                    'message'             => $message,
-                    'original_email'      => $original_email,
-                    'has_primary_contact' => (total_rows(db_prefix() . 'contacts', ['userid' => $customer_id, 'is_primary' => 1]) > 0 ? true : false),
-                ]);
-            die;
         }
-
 
         $data['calling_code'] = $callingCode;
-
-        if ($contact_id == '') {
-            $title = _l('add_new', _l('contact_lowercase'));
-        } else {
-            $data['contact'] = $this->clients_model->get_contact($contact_id);
-
-            if (!$data['contact']) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Contact Not Found',
-                ]);
-                die;
-            }
-            $title = $data['contact']->firstname . ' ' . $data['contact']->lastname;
-        }
 
         $data['customer_permissions'] = get_contact_permissions();
         $data['title']                = $title;
         $this->load->view('admin/clients/modals/contact', $data);
+    }
+    public function get_model_brand($id){
+
+       
+        $data =  $this->db->where(db_prefix() .'brand_model.id_brand', $id);
+        $data = $this->db->get(db_prefix() . 'brand_model')->result_array();
+
+        header('Content-Type: application/json');
+
+        echo json_encode( $data ) ;
+
     }
 
     public function confirm_registration($client_id)
@@ -591,9 +690,16 @@ class Clients extends AdminController
 
     public function contacts($client_id)
     {
+       
+        // var_dump($this->app->get_table_data('contacts', [
+        //     'client_id' => $client_id,
+        // ]));
+        // exit();
+
         $this->app->get_table_data('contacts', [
             'client_id' => $client_id,
         ]);
+
     }
 
     public function upload_attachment($id)

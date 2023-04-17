@@ -15,6 +15,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
  */
 function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where = [], $additionalSelect = [], $sGroupBy = '', $searchAs = [])
 {
+
+
+  
+
     $CI          = & get_instance();
     $__post      = $CI->input->post();
     $havingCount = '';
@@ -123,19 +127,29 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         $search_value = $__post['search']['value'];
         $search_value = trim($search_value);
 
+    
+
+
         $sWhere             = 'WHERE (';
         $sMatchCustomFields = [];
         // Not working, do not use it
         $useMatchForCustomFieldsTableSearch = hooks()->apply_filters('use_match_for_custom_fields_table_search', 'false');
 
+        
+
         for ($i = 0; $i < count($aColumns); $i++) {
             $columnName = $aColumns[$i];
+            
+
             if (strpos($columnName, ' as ') !== false) {
                 $columnName = strbefore($columnName, ' as');
             }
 
             if (stripos($columnName, 'AVG(') !== false || stripos($columnName, 'SUM(') !== false) {
             } else {
+              
+         
+
                 if (($__post['columns'][$i]) && $__post['columns'][$i]['searchable'] == 'true') {
                     if (isset($searchAs[$i])) {
                         $columnName = $searchAs[$i];
@@ -148,15 +162,21 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
                         $sWhere .= 'convert(' . $columnName . ' USING utf8)' . " LIKE '%" . $CI->db->escape_like_str($search_value) . "%' ESCAPE '!' OR ";
                     }
                 }
+                
             }
         }
+
+      
 
         if (count($sMatchCustomFields) > 0) {
             $s = $CI->db->escape_str($search_value);
             foreach ($sMatchCustomFields as $matchCustomField) {
                 $sWhere .= "MATCH ({$matchCustomField}) AGAINST (CONVERT(BINARY('{$s}') USING utf8)) OR ";
             }
+           
         }
+
+ 
 
         if (count($additionalSelect) > 0) {
             foreach ($additionalSelect as $searchAdditionalField) {
@@ -172,6 +192,9 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         }
         $sWhere = substr_replace($sWhere, '', -3);
         $sWhere .= ')';
+
+       
+
     } else {
         // Check for custom filtering
         $searchFound = 0;
@@ -201,6 +224,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         } else {
             $sWhere = '';
         }
+    
     }
 
     /*
@@ -225,6 +249,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     }
 
     $join = implode(' ', $join);
+    
+   
 
     $sQuery = '
     SELECT SQL_CALC_FOUND_ROWS ' . str_replace(' , ', ' ', implode(', ', $_aColumns)) . ' ' . $_additionalSelect . "
@@ -237,13 +263,23 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     $sLimit
     ";
 
+    // var_dump($sTable , $join ,$sWhere , $where , $sGroupBy  );
+    // exit();
+
+    // SELECT tblcars.*, tblbrand.* , tblbrand_model.* FROM tblcars INNER JOIN tblbrand ON tblcars.id_brand=tblbrand.id INNER JOIN tblbrand_model ON tblbrand.id = tblbrand_model.id_brand where tblcars.id_customer =2;    
     $rResult = $CI->db->query($sQuery)->result_array();
+
+
+  
+
 
     $rResult = hooks()->apply_filters('datatables_sql_query_results', $rResult, [
         'table' => $sTable,
         'limit' => $sLimit,
         'order' => $sOrder,
     ]);
+
+
 
     /* Data set length after filtering */
     $sQuery = '
@@ -271,6 +307,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         'aaData'               => [],
         ];
 
+    
     return [
         'rResult' => $rResult,
         'output'  => $output,
@@ -311,6 +348,8 @@ function get_null_columns_that_should_be_sorted_as_last()
  */
 function render_datatable($headings = [], $class = '', $additional_classes = [''], $table_attributes = [])
 {
+//    var_dump($class);exit();
+
     $_additional_classes = '';
     $_table_attributes   = ' ';
     if (count($additional_classes) > 0) {
@@ -318,19 +357,26 @@ function render_datatable($headings = [], $class = '', $additional_classes = [''
     }
     $CI      = & get_instance();
     $browser = $CI->agent->browser();
+
+
+
     $IEfix   = '';
     if ($browser == 'Internet Explorer') {
         $IEfix = 'ie-dt-fix';
     }
 
+
     foreach ($table_attributes as $key => $val) {
         $_table_attributes .= $key . '=' . '"' . $val . '" ';
     }
-
+   
+    // var_dump($IEfix  , $_table_attributes , $class , $_additional_classes);
+    // exit();
     $table = '<div class="' . $IEfix . '"><table' . $_table_attributes . 'class="dt-table-loading table table-' . $class . '' . $_additional_classes . '">';
     $table .= '<thead>';
     $table .= '<tr>';
     foreach ($headings as $heading) {
+       
         if (!is_array($heading)) {
             $table .= '<th>' . $heading . '</th>';
         } else {
@@ -343,12 +389,18 @@ function render_datatable($headings = [], $class = '', $additional_classes = [''
             $th_attrs = ($th_attrs != '' ? ' ' . $th_attrs : $th_attrs);
             $table .= '<th' . $th_attrs . '>' . $heading['name'] . '</th>';
         }
+        
     }
     $table .= '</tr>';
     $table .= '</thead>';
     $table .= '<tbody></tbody>';
     $table .= '</table></div>';
+
+
     echo $table;
+    // var_dump($table);
+    //     exit();;
+    //     exit();
 }
 
 /**

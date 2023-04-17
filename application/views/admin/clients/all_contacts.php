@@ -23,32 +23,34 @@
                             </div>
                         </div>
                         <?php } ?>
-                        <div class="clearfix"></div>
-                        <?php
-        $table_data = [_l('client_firstname'), _l('client_lastname')];
-        if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') {
-            array_push($table_data, [
-          'name'     => _l('gdpr_consent') . ' (' . _l('gdpr_short') . ')',
-          'th_attrs' => ['id' => 'th-consent', 'class' => 'not-export'],
-        ]);
-        }
-       $table_data = array_merge($table_data, [
-        _l('client_email'),
-        _l('clients_list_company'),
-        _l('client_phonenumber'),
-        _l('contact_position'),
-        _l('clients_list_last_login'),
-        _l('contact_active'),
-      ]);
-       $custom_fields = get_custom_fields('contacts', ['show_on_table' => 1]);
-       foreach ($custom_fields as $field) {
-           array_push($table_data, [
-           'name'     => $field['name'],
-           'th_attrs' => ['data-type' => $field['type'], 'data-custom-field' => 1],
-         ]);
-       }
-      render_datatable($table_data, 'all-contacts');
-      ?>
+                                <div class="clearfix"></div>
+                                <?php
+                            $table_data = [];
+                            if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1') {
+                                array_push($table_data, [
+                            'name'     => _l('gdpr_consent') . ' (' . _l('gdpr_short') . ')',
+                            'th_attrs' => ['id' => 'th-consent', 'class' => 'not-export'],
+                            ]);
+                            }
+                        $table_data = array_merge($table_data, [
+                            _l('car_name'),
+                            _l('brand'),
+                            _l('model'),
+                            _l('model_year'),
+                            _l('plate_source'),
+                            _l('plate_code'),
+                            _l('plate_number'),
+                        ]);
+                        $custom_fields = get_custom_fields('contacts', ['show_on_table' => 1]);
+                        foreach ($custom_fields as $field) {
+                            array_push($table_data, [
+                            'name'     => $field['name'],
+                            'th_attrs' => ['data-type' => $field['type'], 'data-custom-field' => 1],
+                            ]);
+                        }
+                        // var_dump(render_datatable($table_data, 'all-contacts')); exit();
+                        echo render_datatable($table_data, 'all-contacts');
+                        ?>
                     </div>
                 </div>
             </div>

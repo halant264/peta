@@ -110,6 +110,9 @@ class Tasks_model extends App_Model
             $task->attachments     = $this->get_task_attachments($id);
             $task->timesheets      = $this->get_timesheeets($id);
             $task->checklist_items = $this->get_checklist_items($id);
+            $task->checklist_car = $this->get_checklist_car($id);
+
+            // var_dump($task->checklist_car); exit();
 
             if (is_staff_logged_in()) {
                 $task->current_user_is_assigned = $this->is_task_assignee(get_staff_user_id(), $id);
@@ -138,6 +141,22 @@ class Tasks_model extends App_Model
         $this->db->where('id', $id);
 
         return $this->db->get(db_prefix() . 'milestones')->row();
+    }
+    public function get_invoice_id($id)
+    {   
+        if($id != '')
+        {
+            $this->db->where('invoice_id', $id);
+            $task = $this->db->get(db_prefix() . 'tasks')->row();
+        }
+        if($task){
+            if($task->customer_car = '' )
+            $this->db->where('invoice_id', $id);
+            $task_car = $this->db->get(db_prefix() . 'tasks')->row();
+        }
+
+        // var_dump($task_car); exit() ; 
+        return $task_car;
     }
 
     public function update_order($data)
@@ -421,6 +440,7 @@ class Tasks_model extends App_Model
      */
     public function add($data, $clientRequest = false)
     {
+        // var_dump($data); exit(); 
         $fromTicketId = null;
 
         if (isset($data['ticket_to_task'])) {
@@ -550,6 +570,11 @@ class Tasks_model extends App_Model
         $this->db->insert(db_prefix() . 'tasks', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
+
+
+            $getCheckListCar = $this->add_checklistcar_allToTask($insert_id);
+
+
             foreach ($checklistItems as $key => $chkID) {
                 if ($chkID != '') {
                     $itemTemplate = $this->get_checklist_template($chkID);
@@ -816,10 +841,12 @@ class Tasks_model extends App_Model
         return $this->db->get(db_prefix() . 'task_checklist_items')->result_array();
     }
 
-    public function add_checklist_template($description)
+    public function add_checklist_template($description , $description_ar, $description_en)
     {
         $this->db->insert(db_prefix() . 'tasks_checklist_templates', [
             'description' => $description,
+            'description_en' => $description_en,
+            'description_ar' => $description_ar,
         ]);
 
         return $this->db->insert_id();
@@ -856,9 +883,12 @@ class Tasks_model extends App_Model
      */
     public function add_checklist_item($data)
     {
+        // var_dump($data);
+        // exit();
         $this->db->insert(db_prefix() . 'task_checklist_items', [
             'taskid'      => $data['taskid'],
-            'description' => $data['description'],
+            'description_en' => $data['description_en'],
+            'description_ar' => $data['description_en'],
             'dateadded'   => date('Y-m-d H:i:s'),
             'addedfrom'   => get_staff_user_id(),
             'list_order'  => 0,
@@ -871,6 +901,96 @@ class Tasks_model extends App_Model
         }
 
         return false;
+    }
+    public function add_checklistcar_item($data)
+    {
+        $this->db->select("*");
+        $this->db->from('car_checklist');
+        $this->db->where('id', $data['carlistid']);
+        $carlistid = $this->db->get()->row();
+
+        $taskid = $this->db->where('taskid', $data['taskid']);
+        $this->db->insert(db_prefix() . 'task_checklist_items', [
+            'taskid'      => $data['taskid'],
+            'car_listid'      => $carlistid->id,
+            'description_en' => $carlistid->check_name_en,
+            'description_ar' => $carlistid->check_name_ar,
+            'dateadded'   => date('Y-m-d H:i:s'),
+            'addedfrom'   => get_staff_user_id(),
+            'list_order'  => 0,
+        ]);
+        $insert_id = $this->db->insert_id();
+
+        $this->db->select("*");
+        $this->db->from('task_checklist_items');
+        $this->db->where('id', $insert_id);
+        $addcarlist = $this->db->get()->row();
+
+        if ($insert_id) {
+            // hooks()->do_action('task_checklist_item_created', ['task_id' => $data['taskid'], 'checklist_id' => $insert_id]);
+            return $addcarlist;
+        }
+        return false;
+    }
+
+    public function get_checklist_car($taskid)
+    {
+        $this->db->where('taskid', $taskid);
+        $this->db->order_by('list_order', 'asc');
+        $task = $this->db->get(db_prefix() . 'task_checklist_items');
+        $task_list = $task ->result_array();
+        $task_list1 = $task->result();
+        $list_id= array();
+        foreach($task_list1 as $row){
+            if($row->car_listid != null){
+              $list_id[] = $row->car_listid;
+            }
+         }
+         $room = implode(",",$list_id);
+         $ids = explode(",", $room);
+
+
+        $this->db->select("*");
+        $this->db->from('car_checklist');
+        $this->db->where_not_in('id', $ids);
+        $query = $this->db->get();
+        $query =  $query->result_array();
+
+        return $query ;
+    }
+    public function get_checklistcar_item($taskid)
+    {
+        
+        $this->db->select("*");
+        $this->db->from('car_checklist');
+        $this->db->where('id', $taskid);
+        $query = $this->db->get();
+        $query =  $query->row();
+
+        return $query ;
+    }
+    public function add_checklistcar_allToTask($taskid)
+    {
+        $this->db->select("*");
+        $this->db->from('car_checklist');
+        $query = $this->db->get();
+        $query =  $query->result_array();
+
+        foreach($query as $key => $value ){
+
+            $this->db->insert(db_prefix() . 'task_checklist_items', [
+                'taskid'      => $taskid,
+                'car_listid'      => $value['id'],
+                'description_en' => $value['check_name_en'],
+                'description_ar' => $value['check_name_ar'],
+                'dateadded'   => date('Y-m-d H:i:s'),
+                'addedfrom'   => get_staff_user_id(),
+                'list_order'  => 0,
+            ]);
+        }
+
+
+        // return $query ;
     }
 
     public function delete_checklist_item($id)
@@ -900,16 +1020,21 @@ class Tasks_model extends App_Model
      * @param  mixed $description checklist description
      * @return void
      */
-    public function update_checklist_item($id, $description)
+    public function update_checklist_item($id, $description_en , $description_ar)
     {
-        $description = strip_tags($description, '<br>,<br/>');
-        if ($description === '') {
+        // var_dump($description_en , $description_ar); exit();
+        $description_en = strip_tags($description_en, '<br>,<br/>');
+        $description_ar = strip_tags($description_ar, '<br>,<br/>');
+        if ($description_en === '' && $description_ar === '') {
+         
             $this->db->where('id', $id);
             $this->db->delete(db_prefix() . 'task_checklist_items');
         } else {
+
             $this->db->where('id', $id);
             $this->db->update(db_prefix() . 'task_checklist_items', [
-                'description' => nl2br($description),
+                'description_en' => nl2br($description_en),
+                'description_ar' => nl2br($description_ar),
             ]);
         }
     }

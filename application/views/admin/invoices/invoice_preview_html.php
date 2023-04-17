@@ -169,7 +169,7 @@ if (isset($invoice->scheduled_email) && $invoice->scheduled_email) { ?>
         <div class="col-md-5 col-md-offset-7">
             <table class="table text-right">
                 <tbody>
-                    <tr id="subtotal">
+                    <tr id="subtotal">  
                         <td>
                             <span class="bold tw-text-neutral-700"><?php echo _l('invoice_subtotal'); ?></span>
                         </td>
@@ -251,6 +251,7 @@ if (isset($invoice->scheduled_email) && $invoice->scheduled_email) { ?>
                 </tbody>
             </table>
         </div>
+       
     </div>
     <?php if (count($invoice->attachments) > 0) { ?>
     <div class="clearfix"></div>

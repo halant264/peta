@@ -669,6 +669,16 @@ $lang['task_priority_urgent']               = 'Urgent';
 $lang['task_add_edit_start_date']           = 'Start Date';
 $lang['task_add_edit_due_date']             = 'Due Date';
 $lang['task_add_edit_description']          = 'Task Description';
+$lang['car_info']                           = 'car info';
+$lang['new_car']   	                        ='new car';
+$lang['car_name']   	                    ='car name';
+$lang['brand']                              ='brand';
+$lang['model']   	                        ='model';
+$lang['model_year']   	                    ='model year';
+$lang['plate_source']   	                ='plate source';
+$lang['plate_code']   	                    ='plate code';
+$lang['plate_number']   	                ='plate number';
+
 
 # Taxes
 $lang['new_tax']           = 'New Tax';
@@ -3867,3 +3877,8 @@ $lang['receipt']                         = 'Receipt';
 $lang['search_proposals']                = 'Search Proposals';
 $lang['search_estimates']                = 'Search Estimates';
 $lang['quick_create']                    = 'Quick Create';
+$lang['car']      	 =	 'Car';
+$lang['new_car']      	 =	 'New Car';
+$lang['add_new_car']      	 =	'Add New Car';
+
+

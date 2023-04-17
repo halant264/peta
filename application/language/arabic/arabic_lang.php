@@ -665,6 +665,10 @@ $lang['task_priority_urgent']                 	 =	 'العاجلة';
 $lang['task_add_edit_start_date']             	 =	 'تاريخ البدء';
 $lang['task_add_edit_due_date']               	 =	 'تاريخ الاستحقاق';
 $lang['task_add_edit_description']            	 =	 'وصف المهمة';
+$lang['car_info']            	 =	 'معلومات السيارة';
+$lang['Add new']            	 =	 'مهمة جديدة';
+
+
 	
 # Taxes	 =	# Taxes;
 $lang['new_tax']             	 =	 'ضريبة جديدة';
@@ -1135,12 +1139,12 @@ $lang['contract_type_name']         	 =	 'الاسم';
 $lang['contract_types_list_name']   	 =	 'نوع العقد';
 	
 # Customizer Menu	 =	# Customizer Menu;
-$lang['acs_contracts']        	 =	 'عقود';
-$lang['acs_contract_types']   	 =	 'أنواع العقود';
+$lang['acs_contracts']        	         ='عقود';
+$lang['acs_contract_types']   	         ='أنواع العقود';
 	
 # Version 1.0.4	 =	# Version 1.0.4;
 # Invoice Items	 =	# Invoice Items;
-$lang['invoice_item_long_description']   	 =	 'وصف طويل';
+$lang['invoice_item_long_description']   	    =	 'وصف طويل';
 	
 # Customers	 =	# Customers;
 $lang['clients_list_phone']                  	 =	 'هاتف';
@@ -1149,6 +1153,22 @@ $lang['customers_summary']                   	 =	 'ملخص العملاء';
 $lang['customers_summary_active']            	 =	 'جهات الاتصال النشطة';
 $lang['customers_summary_inactive']          	 =	 'جهات اتصال غير نشطة';
 $lang['customers_summary_logged_in_today']   	 =	 'تم تسجيل دخول جهات الاتصال اليوم';
+$lang['new_car']   	                             ='سيارة جديدة';
+$lang['car_name']                           	 ='اسم السيارة';
+$lang['brand']   	                             ='براند السيارة';
+$lang['model']   	                             ='موديل السيارة';
+$lang['model_year']   	                         ='سنة الصنع';
+$lang['plate_source']   	                     ='لوحة_المصدر';
+$lang['plate_code']   	                         ='لوحة_رمز';
+$lang['plate_number']   	                     ='رقم لوحة';
+$lang['Showing']   	                             ='عرض';
+$lang['customer_cars']   	                     ='سيارات العملاء';
+$lang['customer_car']   	                     ='سيارة العميل';
+$lang['select_model']   	                     ='اختر الموديل';
+$lang['select_brand']   	                     ='اختر العلامة التجارية';
+$lang['select_car']   	                         ='اختر سيارة';
+
+
 	
 # Authentication	 =	# Authentication;
 $lang['admin_auth_forgot_password_email']       	 =	 'عنوان البريد الإلكتروني';
@@ -3860,4 +3880,7 @@ $lang['receipt']                           	 =	 'إيصال';
 $lang['search_proposals']                  	 =	 'مقترحات البحث';
 $lang['search_estimates']                  	 =	 'بحث عروض الاسعار';
 $lang['quick_create']      	 =	 'إنشاء سريع';
+$lang['car']      	 =	 'سيارة';
+$lang['new_car']      	 =	 'سيارة جديدة';
+$lang['add_new_car']      	 =	 'إضافة سيارة جديدة';
 

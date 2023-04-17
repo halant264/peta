@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="_filters _hidden_inputs hidden">
-                    <?php
+                    <?php  
                   echo form_hidden('my_customers');
                   echo form_hidden('requires_registration_confirmation');
                   foreach ($groups as $group) {
@@ -39,16 +39,16 @@
                     <a href="<?php echo admin_url('clients/client'); ?>"
                         class="btn btn-primary mright5 test pull-left display-block">
                         <i class="fa-regular fa-plus tw-mr-1"></i>
-                        <?php echo _l('new_client'); ?></a>
-                    <a href="<?php echo admin_url('clients/import'); ?>"
+                        <?php echo _l('new_contact'); ?></a>
+                    <!-- <a href="<?php echo admin_url('clients/import'); ?>"
                         class="btn btn-primary pull-left display-block mright5 hidden-xs">
                         <i class="fa-solid fa-upload tw-mr-1"></i>
                         <?php echo _l('import_customers'); ?></a>
-                    <?php } ?>
+                    <?php } ?> -->
                     <a href="<?php echo admin_url('clients/all_contacts'); ?>"
                         class="btn btn-default pull-left display-block mright5">
                         <i class="fa-regular fa-user tw-mr-1"></i>
-                        <?php echo _l('customer_contacts'); ?>
+                        <?php echo _l('customer_cars'); ?>
                     </a>
                     <div class="visible-xs">
                         <div class="clearfix"></div>
@@ -272,7 +272,8 @@
                                         data-title="<?php echo _l('customers_summary_logged_in_today'); ?>">
                                         <?php
                            $contactsTemplate = '';
-                      if (count($contacts_logged_in_today) > 0) {
+                      if (count($contacts_logged_in_today) > 0) { var_dump($contacts_logged_in_today);
+                        exit();
                           foreach ($contacts_logged_in_today as $contact) {
                               $url          = admin_url('clients/client/' . $contact['userid'] . '?contactid=' . $contact['id']);
                               $fullName     = $contact['firstname'] . ' ' . $contact['lastname'];
@@ -351,14 +352,14 @@
                          'name'     => _l('clients_list_company'),
                          'th_attrs' => ['class' => 'toggleable', 'id' => 'th-company'],
                         ],
-                         [
-                         'name'     => _l('contact_primary'),
-                         'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact'],
-                        ],
-                         [
-                         'name'     => _l('company_primary_email'),
-                         'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact-email'],
-                        ],
+                        //  [
+                        //  'name'     => _l('contact_primary'),
+                        //  'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact'],
+                        // ],
+                        //  [
+                        //  'name'     => _l('company_primary_email'),
+                        //  'th_attrs' => ['class' => 'toggleable', 'id' => 'th-primary-contact-email'],
+                        // ],
                         [
                          'name'     => _l('clients_list_phone'),
                          'th_attrs' => ['class' => 'toggleable', 'id' => 'th-phone'],
@@ -367,10 +368,10 @@
                          'name'     => _l('customer_active'),
                          'th_attrs' => ['class' => 'toggleable', 'id' => 'th-active'],
                         ],
-                        [
-                         'name'     => _l('customer_groups'),
-                         'th_attrs' => ['class' => 'toggleable', 'id' => 'th-groups'],
-                        ],
+                        // [
+                        //  'name'     => _l('customer_groups'),
+                        //  'th_attrs' => ['class' => 'toggleable', 'id' => 'th-groups'],
+                        // ],
                         [
                          'name'     => _l('date_created'),
                          'th_attrs' => ['class' => 'toggleable', 'id' => 'th-date-created'],
@@ -393,12 +394,16 @@
 
 
                      ?>
-                        <div class="panel-table-full">
-                            <?php
-                         render_datatable($table_data, 'clients', ['number-index-2'], [
+                        <div class=" panel_s panel-table-full">
+                            <?php 
+                            
+                 
+                         render_datatable($table_data, 'clients', ['number-index-2']
+                         , [
                            'data-last-order-identifier' => 'customers',
                            'data-default-order'         => get_table_last_order('customers'),
-                     ]);
+                         ]
+                    );
                      ?>
                         </div>
                     </div>
