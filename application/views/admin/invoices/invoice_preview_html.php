@@ -89,11 +89,11 @@ if (isset($invoice->scheduled_email) && $invoice->scheduled_email) { ?>
         <div class="col-md-6 col-sm-6">
             <h4 class="bold">
                 <?php
-         $tags = get_tags_in($invoice->id, 'invoice');
-         if (count($tags) > 0) {
-             echo '<i class="fa fa-tag" aria-hidden="true" data-toggle="tooltip" data-title="' . html_escape(implode(', ', $tags)) . '"></i>';
-         }
-        ?>
+            $tags = get_tags_in($invoice->id, 'invoice');
+            if (count($tags) > 0) {
+                echo '<i class="fa fa-tag" aria-hidden="true" data-toggle="tooltip" data-title="' . html_escape(implode(', ', $tags)) . '"></i>';
+            }
+            ?>
                 <a href="<?php echo admin_url('invoices/invoice/' . $invoice->id); ?>">
                     <span id="invoice-number">
                         <?php echo format_invoice_number($invoice->id); ?>
@@ -104,6 +104,21 @@ if (isset($invoice->scheduled_email) && $invoice->scheduled_email) { ?>
                 <?php echo format_organization_info(); ?>
             </address>
             <?php hooks()->do_action('after_left_panel_invoice_preview_template', $invoice); ?>
+
+            <?php $pdf_custom_fields = get_custom_fields('invoice', ['show_on_pdf' => 1]);
+                foreach ($pdf_custom_fields as $field) {
+                    $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
+                    if ($value == '') {
+                        continue;
+                    } ?>
+                    <p class="no-mbot">
+                        <span class="bold"><?php echo $field['name']; ?>: </span>
+                        <?php echo $value; ?>
+                    </p>
+                    <?php
+                } ?>
+            <?php hooks()->do_action('after_right_panel_invoice_preview_template', $invoice); ?>
+
         </div>
         <div class="col-sm-6 text-right">
             <span class="bold"><?php echo _l('invoice_bill_to'); ?></span>
@@ -142,19 +157,7 @@ if (isset($invoice->scheduled_email) && $invoice->scheduled_email) { ?>
                 <?php echo get_project_name_by_id($invoice->project_id); ?>
             </p>
             <?php } ?>
-            <?php $pdf_custom_fields = get_custom_fields('invoice', ['show_on_pdf' => 1]);
-   foreach ($pdf_custom_fields as $field) {
-       $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
-       if ($value == '') {
-           continue;
-       } ?>
-            <p class="no-mbot">
-                <span class="bold"><?php echo $field['name']; ?>: </span>
-                <?php echo $value; ?>
-            </p>
-            <?php
-   } ?>
-            <?php hooks()->do_action('after_right_panel_invoice_preview_template', $invoice); ?>
+            
         </div>
     </div>
     <div class="row">

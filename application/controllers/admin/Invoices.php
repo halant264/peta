@@ -712,7 +712,6 @@ class Invoices extends AdminController
         if ($this->input->get('print')) {
             $type = 'I';
         }
-        // var_dump(mb_strtoupper(slug_it($invoice_number))) ; exit(); 
 
         $pdf->Output(mb_strtoupper(slug_it($invoice_number)) . '.pdf', $type);
     }

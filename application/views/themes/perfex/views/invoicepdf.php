@@ -28,9 +28,19 @@ pdf_multi_row($info_left_column, $info_right_column, $pdf, ($dimensions['wk'] / 
 
 $pdf->ln(10);
 
-$organization_info = '<div style="color:#424242;">';
+$organization_info = '<div style="color:#424242;"> ';
 
 $organization_info .= format_organization_info();
+
+$organization_info .= hooks()->apply_filters('invoice_pdf_header_before_custom_fields', $invoice_info, $invoice);
+
+foreach ($pdf_custom_fields as $field) {
+    $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
+    if ($value == '') {
+        continue;
+    }
+    $organization_info .= $field['name'] . ': ' . $value . '<br />';
+}
 
 $organization_info .= '</div>';
 
@@ -67,15 +77,15 @@ if ($invoice->project_id != 0 && get_option('show_project_on_invoice') == 1) {
     $invoice_info = hooks()->apply_filters('invoice_pdf_header_after_project_name', $invoice_info, $invoice);
 }
 
-$invoice_info = hooks()->apply_filters('invoice_pdf_header_before_custom_fields', $invoice_info, $invoice);
+// $invoice_info = hooks()->apply_filters('invoice_pdf_header_before_custom_fields', $invoice_info, $invoice);
 
-foreach ($pdf_custom_fields as $field) {
-    $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
-    if ($value == '') {
-        continue;
-    }
-    $invoice_info .= $field['name'] . ': ' . $value . '<br />';
-}
+// foreach ($pdf_custom_fields as $field) {
+//     $value = get_custom_field_value($invoice->id, $field['id'], 'invoice');
+//     if ($value == '') {
+//         continue;
+//     }
+//     $invoice_info .= $field['name'] . ': ' . $value . '<br />';
+// }
 
 $invoice_info      = hooks()->apply_filters('invoice_pdf_header_after_custom_fields', $invoice_info, $invoice);
 $organization_info = hooks()->apply_filters('invoicepdf_organization_info', $organization_info, $invoice);
@@ -83,6 +93,7 @@ $invoice_info      = hooks()->apply_filters('invoice_pdf_info', $invoice_info, $
 
 $left_info  = $swap == '1' ? $invoice_info : $organization_info;
 $right_info = $swap == '1' ? $organization_info : $invoice_info;
+// var_dump($left_info); exit();
 
 pdf_multi_row($left_info, $right_info, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
 
@@ -99,7 +110,7 @@ $pdf->writeHTML($tblhtml, true, false, false, false, '');
 $pdf->Ln(8);
 
 $tbltotal = '';
-$tbltotal .='<div> dvdvd </div>';
+$tbltotal .='<div>  </div>';
 
 $tbltotal .= '<table cellpadding="6" style="font-size:' . ($font_size + 4) . 'px">';
 $tbltotal .= '

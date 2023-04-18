@@ -2,7 +2,7 @@
 <table class="table dt-table table-ticket-reports" data-order-col="0" data-order-type="asc">
     <thead>
     <tr>
-        <th><?php echo _l('ticket_reports_staff'); ?></th>
+        <th><?php echo _l('ticket_reports_staff') ; ?></th>
         <th><?php echo _l('ticket_reports_total_assigned'); ?></th>
         <th><?php echo _l('ticket_reports_open_tickets'); ?></th>
         <th><?php echo _l('ticket_reports_closed_tickets'); ?></th>

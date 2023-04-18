@@ -6,7 +6,7 @@
                 <?php echo get_company_logo(get_admin_uri() . '/', '!tw-mt-0')?>
             </div>
         </li>
-        <?php
+        <?php 
          hooks()->do_action('before_render_aside_menu');
          ?>
         <?php foreach ($sidebar_menu as $key => $item) {

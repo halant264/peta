@@ -642,7 +642,7 @@ class Tasks extends AdminController
         // $ignore = array(28,30);
 
         $data =  $this->db->where(db_prefix() .'cars.id_customer', $id);
-        $data =  $this->db->where_not_in('id', $ids);
+        // $data =  $this->db->where_not_in('id', $ids);
         $data = $this->db->get(db_prefix() . 'cars')->result_array();
 
         header('Content-Type: application/json');
