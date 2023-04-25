@@ -14,7 +14,7 @@
                         <input type="file" name="file" multiple />
                         <?php echo form_close(); ?>
                         <div class="row mtop15" id="sales_uploaded_files_preview">
-                        </div>
+                        </div> 
                         <div class="tw-flex tw-justify-end tw-items-center tw-space-x-2">
                             <button class="gpicker" data-on-pick="salesGoogleDriveSave">
                                 <i class="fa-brands fa-google" aria-hidden="true"></i>

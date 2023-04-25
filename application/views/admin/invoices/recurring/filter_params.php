@@ -6,6 +6,7 @@
 	}
 	foreach($invoices_years as $year){
 		echo form_hidden('year_'.$year['year'],$year['year']);
+		
 	}
 	?>
 </div>

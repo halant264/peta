@@ -132,7 +132,7 @@
             </div>
         </div>
         <div class="col-md-7 small-table-right-col">
-            <div id="invoice" class="hide">
+            <div id="invoice" class="hide">            
             </div>
         </div>
     </div>
